@@ -1,0 +1,12 @@
+{
+    "title": [
+        "New page"
+    ],
+    "toc": [],
+    "h1": [],
+    "h2": [],
+    "h3": [],
+    "content": [
+        "There are four easy ways to start a new page:\n\nYou can click a red link to the title of the new page from an existing one. For example, to create an article called \"This link\", you could click Link (unless someone has created it already on this Wikia). You can also create the link yourself, in a related page or index page. Links on related pages are not only convenient for navigation, but also make people aware of the new page.\nYou can also start a new page by typing the URL directly. An easy way to produce the URL is editing the last part of the URL of another page in the same project. (For example, if you are editing on example.wikia.com and you would like to create \"This link\", go to http://example.wikia.com/wiki/Link.) To prevent your new page being an \"orphan\", you should link to it from other pages.\nIf you search for a page that is not yet on this wiki, you will see a red link at the top of the search list. Clicking this is another way to get to the edit page for the new article.\nThe easest way to create an article is with an inputbox. Typing the new title in the box, and pressing \"create article\" will take you to the edit page for that article. To see how to add an inputbox, look at the code for the edit box of this page, or see the Central help page\n\nBefore using one of those last methods, have a search to see whether there is already a page with a name very like the one you propose. Splitting pages later is easier than merging near-duplicates.\n\n<createbox> </createbox>"
+    ]
+}

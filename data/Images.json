@@ -1,0 +1,15 @@
+{
+    "title": [
+        "Images"
+    ],
+    "toc": [],
+    "h1": [],
+    "h2": [
+        "Uploading",
+        "Using Images"
+    ],
+    "h3": [],
+    "content": [
+        "All images added to this wiki must be \"free-use\". That is, they must either by public domain or licensed by the copyright holder under a licence that allows anyone to reuse the images. It's important that we do not add images taken from other websites as these are usually not free-use and would be copyright violations. See Help:Image copyright tags for more detail on licences and how to tag your images.\n\nUploading\nTo upload images you must be logged in.\nClick on \"Upload file\" in the toolbox on the left (under the search boxes)\nThe \"Browse\" button lets you find the image on your hard drive. Click \"open\" to select the file.\nIf you want to change the file name, you can do so in the \"Destination filename\" box.\nUse the \"Summary\" box to enter the source of the file and the image copyright tag\nClick \"Upload\".\n\nYou will be warned if the name will be changed or if there is already a file with that name. You can then decide whether to go ahead or to abandon the upload.\n\nUsing Images\nTo use an image in an article, you simply surround the full name (including the \"Image\" part) in double square brackets:\n\n[[Image:Example.jpg]] will give you: \n\nYou can resize by adding the size in pixels between two pipes:\n\n[[Image:Example.jpg|50px|]] will give you: \n\n\nYou can make an image a thumbnail an image by adding \"thumb\" in the same way. If a pipe is there from a previous variable, you don't need to add another:\n\n\n\n[[Image:Example.jpg|50px|thumb|]] will give you:\n\n\nThis is automatically formatted to the right of the page. You can change this by adding \"left\" or \"center\":\n\n[[Image:Example.jpg|50px|thumb|left|]] will give you:\n\n\nAnything after the last pipe becomes the alt text or the caption:\n\n[[Image:Example.jpg|50px|thumb|left|Alt]] will give you:\n\nAlt\n\n\n\nTo link to a file without showing it on the page, you can use \"Media\" instead of \"Image\":\n\n[[Media:Example.jpg]] will give you: Media:Example.jpg\n\nTo link to the image page instead, use a colon before the word \"Image\":\n\n[[:Image:Example.jpg]] will give you: Image:Example.jpg\n\nFinally, to create a gallery of images you can use the <gallery> tag:\n\n<gallery>\n\n\nImage:Example.jpg|1\nImage:Example.jpg|2\nImage:Example.jpg|3\n</gallery>\n\nWill give you:\n\n1\n2\n3\n\n"
+    ]
+}

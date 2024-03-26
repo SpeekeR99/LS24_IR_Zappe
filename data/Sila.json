@@ -1,0 +1,18 @@
+{
+    "title": [
+        "Síla"
+    ],
+    "toc": [],
+    "h1": [],
+    "h2": [
+        " Úroveň 1",
+        " Úroveň 2",
+        " Úroveň 3",
+        " Úroveň 4",
+        " Úroveň 5"
+    ],
+    "h3": [],
+    "content": [
+        "Síla – attribute governs not only physical strength, but is also related to Vitalita and silný styl swordsmanship. There are five basic levels, each with a selection of attributes.\n\nÚroveň 1 | Úroveň 2 | Úroveň 3 | Úroveň 4 | Úroveň 5\n Úroveň 1\n\nSíla (úroveň 1)\nZranění + 5%\nKrytí + 5%\nŽivoty + 25\nOdolnost vůči Krvácení + 5%\nOdolnost vůči Povalení + 5%\n\t\n\nRauš\nImunita vůči Bolesti\nZranění + 25%\nÚnik − 50%\nKrytí − 50%\nÙčinkuje pouze tehdy, když je zaklínač pod vlivem alkoholu\n\t\n\nBojové odhodlání\nZranění + 50%\nFunguje pouze tehdy, pokud má zaklínač méně než 25% životů\nVyžaduje vypití mutagenu\n Úroveň 2\n\nSíla (úroveň 2)\nZranění + 5%\nKrytí + 5%\nŽivoty + 50\nOdolnost vůči Krvácení + 5%\nOdolnost vůči Povalení + 5%\n\t\n\nStřeh\nKrytí + 10%\n\t\n\nRegenerace\nRegenerace života + 1 za vteřino\n\t\n\nBijec\nOdblokuje posílení v pěstním souboji\n Úroveň 3\n\nSíla (úroveň 3)\nZranění + 10%\nKrytí + 5%\nŽivoty + 75\nOdolnost vůči Krvácení + 10%\nOdolnost vůči Povalení + 10%\nOdemkne 4. úroveň sílných stylů (ocelový a stříbrný)\n\t\n\nVitalita\nPřidává + 2 životy za kažou úroveň postavy\n\t\n\nOdolnost vůči Povalení\nOdolnost vůči Povalení + 50%\n\t\n\nInstinkt Přežití\nZranění + 30%\nFunguje pouze tehdy, pokud zaklínač Krvácí\n Úroveň 4\n\nSíla (úroveň 4)\nZranění + 10%\nKrytí + 5%\nŽivoty + 100\nOdolnost vůči Krvácení + 10%\nOdolnost vůči Povalení + 10%\nOdemkne 5. úroveň sílných stylů (ocelový a stříbrný)\n\t\n\nOdolnost vůči Krvácení\nOdolnost vůči Krvácení + 50%\n\t\n\nKamenná Kůže\nBrnění + 5\n\t\n\nAgrese\nZranění + 10%\n Úroveň 5\n\nSíla (úroveň 5)\nZranění + 20%\nKrytí + 10%\nŽivoty + 150\nOdolnost vůči Krvácení + 20%\nOdolnost vůči Povalení + 20%\n\t\n\nOdolnost vůči Zranění\nOdolnost vůči Zranění + 25%\n\t\n\nPosílený Život\nŽivoty + 20%"
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "title": [
+        "Čarodějka (Versus)"
+    ],
+    "toc": [],
+    "h1": [],
+    "h2": [
+        "Schopnosti Čarodějky"
+    ],
+    "h3": [],
+    "content": [
+        "Čarodějka je jedna ze tří kategorií dostupných v on-line hře Witcher: Versus.\n\nSchopnosti Čarodějky\nIkonka\tNázev\tPopis\tStyl\tFury\tElements\n\tHroty\tPůsobí zranění 10/11/12, pokud není vykryt. Na úrovni dvě a tři navíc přidává poškození 6/12, pokud soupeř použil obranu proti magickému útoku.\tSilný/Země\t0\t0\n\tZemětřesení\tPůsobí zranění 10/13/16. Přeruší soupeřův speciální útok v příštím kole.\tSilný/Země\t1\t0\n\tKamenná pěst\tSilný, krutý útok. Působí zranění 18/23/28.\tSilný/Země\t2\t0\n\tZmizení\tObrana proti silnému útoku. Redukce zranění –10/15/15. Na třetí úrovni navíc snižuje pravděpodobnost být kriticky zasažen o 50%.\tSilný/Přemístění\t0\t0\n\tTeleport\tObrana proti silnému útoku. Redukce poškození –12/16/20. Pokud útočník použil silný útok, zvyšuje intenzitu silného útoku v příštím kole o 4/6/8.\tSilný/Přemístění\t0\t0\n\tRozostření\tObrana proti silnému útoku. Redukce poškození v tomto a následujícím kole -14/18/22. Snižuje pravděpodobnost být kriticky zasažen v tomto a následujícím kole o 30/40/50%.\tSilný/Přemístění\t1\t0\n\tVýboj\tPůsobí zranění 10/13/16, pokud není vykryt.\tRychlý/Blesky\t0\t0\n\tBlesk\tPůsobí zranění 10/13/16 v tomto kole a 6/8/10 v kole příštím.\tRychlý/Blesky\t0\t1\n\tŠok\tPůsobí zranění 10/10/10, šance způsobit dvojnásobné poškození 40/60/80%. Způsobuje zranitelnost magií.\tRychlý/Blesky\t1\t1\n\tOchrana\tObrana proti rychlému útoku. Redukce poškození -10/15/15. Na třetí úrovni navíc snižuje šanci být kriticky zasažen o 50%.\tRychlý/Ochrana\t0\t0\n\tŠtít\tObrana proti rychlému útoku. Redukce poškození -12/16/16 v tomto kole a -6/8/8 v kole dalším. Na třetí úrovni navíc snižuje šanci být kriticky zasažen o 50% v tomto kole a 25% v kole dalším.\tRychlý/Ochrana\t0\t0\n\tOdraz\tPřeruší rychlý útok nepřítele. Na úrovni dvě a tři navíc redukuje poškození z magickému útoku -6/12.\tRychlý/Ochrana\t0\t1\n\tChoroba\tPůsobí zranění 10/10/10, pokud není vykryto. Na úrovni dvě a tři navíc redukuje poškození ze silného a rychlého útoku -6/12.\tMagický/Život\t0\t0\n\tVysání života\tPůsobí zranění 10/13/16 a současně léčí zranění +4/6/8.\tMagický/Život\t0\t1\n\tOvládnutí\tPůsobí zranění 12/14/16. Zvyšuje intenzitu příštího útoku o 8/11/14.\tMagický/Život\t0\t2\n\tRozpuštění\tObrana proti magickému útoku. Redukce poškození -10/15/15. Na třetí úrovni navíc snižuje šanci být kriticky zasažen o 50%.\tMagický/Protikouzlo\t0\t0\n\tAbsorpce\tŠtít, který redukuje poškození z magického útoku -12/15/18 a ze silného útoku - 5/7/9.\tMagický/Protikouzlo\t0\t0\n\tOslabení\tObrana proti magickému útoku. Redukce poškození -15/20/25. Pokud protivník použil magický útok snižuje jeho šance na kritický zásah o 50/60/70% v tomto a dalších dvou kolech\tMagický/Protikouzlo\t0\t1"
+    ]
+}

@@ -1,0 +1,28 @@
+{
+    "title": [
+        "Do svatyně"
+    ],
+    "toc": [
+        "Obsah\n1\tNávod\n2\tPoznámky\n3\tFáze\n3.1\tDoprovod\n3.2\tKult rybolidí\n3.3\tVěž\n3.4\tHrobka\n3.5\tDoprovod\n3.6\tSvatyně\n3.7\tBerengar"
+    ],
+    "h1": [],
+    "h2": [
+        "Do svatyně",
+        "Popis",
+        "Obsah",
+        "Návod",
+        "Poznámky",
+        "Fáze"
+    ],
+    "h3": [
+        "Akt(y)",
+        "Zadavatel",
+        "Lokace",
+        "Odměna",
+        "Související\núkoly",
+        "ID"
+    ],
+    "content": [
+        "Do svatyně\nPopis\nAkt(y)\nAkt II\nZadavatel\nDědek\nLokace\nBažiny\nOdměna\n2500 XP\nSouvisející\núkoly\nKanibal, Květy a zlato\nID\nq2004_toshrine\n\nGeralt se nevyhnutelně ocitl na blatech a kousek od Převozníka narazil na Dědka. Dědkovi celkem slušně šplouchá na maják, ale požádá Geralta o doprovod ke Svatyni Melitelé v bažinách.\n\nVarování - Spoiler : Následují zásadní informace o ději, které mohou prozradit příběhové zápletky.\nObsah\n1\tNávod\n2\tPoznámky\n3\tFáze\n3.1\tDoprovod\n3.2\tKult rybolidí\n3.3\tVěž\n3.4\tHrobka\n3.5\tDoprovod\n3.6\tSvatyně\n3.7\tBerengar\nNávod\n\nGeralt se může rovnou vydat na západ od cihlářské vesničky, směrem k Oltáři Melitelé.\n\nNebo se může s Dědkem po blatech trochu projít; přeci jen je nesmrtelný.\n\nPokud Geralt s Dědkem v patách projde kolem Hliniště, Mágovy věže, Druidského hájku a Jeskyně, dědek mu poví zajímavosti a historické skazky ohledně těchto míst a příbězích, které se s nimi pojí.\n\nPoznámky\nPokud Geralt chce úspěšně dokončit tento úkol, měl by se vyhnout Dědkově domu (severovýchodní část mapy).\n*BUG* Pokud Geralt vstoupí do Dědkova domu a projde kolem jeho stolu, spustí se úkol Kanibal a tento úkol (Do svatyně) půjde dokončit (selže) pouze zabitím Dědka. Znamená to tedy, že pokud se Geralt rozhodne Dědka ušetřit prostřednictvím dialogu, tento úkol zůstane viset v deníku (-need edit- není zjištěné, zda se automaticky dokončí selháním po skončení 2. kapitoly).\nBUG* vstup do Jeskyně s Dědkem za zadkem může způsobit, že se automaticky vrátí zpět k Převozníkovi a Geralta již nebude následovat.\nPokud Geralt před započetím tohoto úkol již začal úkol Květy a zlato pro Yarena Bolta, pak Dědek Geraltovi prozradí recept na Parfém.\nFáze\nDoprovod\n\nStařík, kterému lidé říkají Dědek, mě požádal, abych ho doprovodil do svatyně Melitelé na blatech. Musím jít s ním a dát pozor, aby se mu nestalo něco zlého.\n\nMusím doprovodit Dědka do svatyně Melitelé.\nKult rybolidí\n\nDědek mi řekl, že cihláři mají jakýsi zvláštní kult. Uctívají bytosti, kterým se říká rybolidé nebo ryboocí, a komunikují s nimi pomocí předmětů, které nechávají na oltáři. Musím jít s Dědkem až do svatyně Melitelé.\n\nMusím doprovodit Dědka do svatyně Melitelé.\nVěž\n\nŠli jsme kolem staré věže a Dědek mi vyprávěl, co se o ní povídá. Od té doby, co zemřel majitel věže, se nikomu nepodařilo proniknout dovnitř. Kdo by ji chtěl otevřít, musel by umístit speciální runové kameny na určité podstavce. Dědek rázně vykročil na další cestu. Musím ho hlídat.\n\nMusím doprovodit Dědka do svatyně Melitelé.\nHrobka\n\nDědek mi vyprávěl, že si v jeskyni udělali doupě zdivočelí psi. Jinak je jeskyně poměrně zajímavé místo, údajně je tam někde v temnotách vranská hrobka s pokladem. Dědek se vydal na další cestu. Musím ho doprovodit.\n\nMusím doprovodit Dědka do svatyně Melitelé.\nPokud se Geralt po převzetí úkolu dozví o Dědkově kanibalství a zabije ho\n\nDoprovod\n\nGramps proved tobe nothing short of a cannibal. I just don't care to escort him to the chapel anymore. (ve hře není přeloženo, pozn.překl.)\n\nI refuse to escort Gramps to the chapel.\nSvatyně\n\nDoprovodil jsem Dědka do svatyně Melitelé. Jen ať se ten hodný stařík v klidu pomodlí.\n\nBezpečně jsem doprovodil Dědka do svatyně Melitelé.\nBerengar\n\nNa rozloučenou mi Dědek řekl, že potkal Berengara, Zaklínač se vyptával na kruh živlů, na druidy a na rozvaliny věže. Víc by o tom měli vědět druidové. Dědek mě taky pozval k sobě domů. Možná ho někdy zajdu navštívit.\n\nDědek mě k sobě pozval na návštěvu."
+    ]
+}

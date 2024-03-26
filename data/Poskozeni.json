@@ -1,0 +1,16 @@
+{
+    "title": [
+        "Poškození"
+    ],
+    "toc": [],
+    "h1": [],
+    "h2": [
+        "Poškození boosters",
+        "Stacking of poškození",
+        "Zdroje"
+    ],
+    "h3": [],
+    "content": [
+        "Generally speaking, poškození is the amount of hit points inflicted upon a target by an object or NPC. Mostly we are concerned with damage inflicted by objects wielded by the player character, but of equal consideration is the damaged received by the player character from objects wielded by opponents. This damage amount can range from 0 to the amount of život a target has remaining ve hře.\n\nThe player, or Geralt, can inflict damage by the using zbraně such as ocelový meč, stříbrný meč, znamení nebo miscellaneous zbraně.\n\nPoškození boosters\nČervený meteorit\nIgni\nOcelový rychlý\nOcelový silný\nOcelový skupinový\nQuen\nRuna země\nSíla\nStříbrný rychlý\nStříbrný silný\nStříbrný skupinový\nYrden\nŽlutý meteorit\nStacking of poškození\n\nVe hře Zaklínač, poškození stacks by multiplication. This is best explained with the use of examples.\n\nCase 1:\n\nGeralt wields a steel sword which boasts +50% damage.\nHe then applies a whetstone (+10% damage) to it.\nThe amount of damage he will do then is:\n(base damage) * 1.5 (Weapon damage bonus) * 1.1 (whetstone) = (base damage) * 1.65\n\nCase 2:\n\nGeralt wields a steel sword which boasts +50% damage.\nHe then applies olej proti nekrofágům (+100% damage vs mrchožrouti) to it.\nThe amount of damage he will do against mrchožrouti then is:\n(base damage) * 1.5 (Weapon damage bonus) * 2 (olej proti nekrofágům) = (base damage) * 3\nZdroje\nDanDraver from CD Project RED"
+    ]
+}

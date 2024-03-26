@@ -1,0 +1,14 @@
+{
+    "title": [
+        "Vývoj postavy"
+    ],
+    "toc": [],
+    "h1": [],
+    "h2": [
+        "Návod"
+    ],
+    "h3": [],
+    "content": [
+        "  \n\nVe hře Zaklínač se hráč (tedy zaklínač Geralt) vylepšuje a postupuje na další úrovně získáváním zkušenostních bodů; na další úrovni pak může rozdělit získané talenty mezi schopnosti a atributy.\n\nČtyřmi hlavními atributami jsou: Síla, Obratnost, Výdrž a Inteligence. Tyto jsou pak klíčové k získávání dalších schopností (např. vrhání znamení, boj s ocelovým/stříbrným mečem.\n\nTalenty jsou trojího druhu; bronzové, stříbrné a zlaté. Tyto lze investovat do 'nákupu' atribut a schopností; např.:\n\nAtributy\tZnamení\tOcelový meč\tStříbrný meč\nSíla (strom)\nObratnost (strom)\nVýdrž (strom)\nInteligence (strom)\tAard (strom)\nIgni (strom)\nQuen (strom)\nAxie (strom)\nYrden (strom)\tOcelový silný (strom)\nOcelový rychlý (strom)\nOcelový skupinový (strom)\tStříbrný silný (strom)\nStříbrný rychlý (strom)\nStříbrný skupinový (strom)\nNávod\nSelect the category of feature you would like to enhance from the list on the left side of the Hero screen, then choose from among the highlighted enhancements in the ability tree on the right side of the panel.\nTo commit your choices, left-click on the hourglass. As long as you do not meditate, you can still change your mind about the allocation of talents. To cancel and start over, left-click on the erase icon, or right click on an allocated (but uncommitted) talent to free it up."
+    ]
+}

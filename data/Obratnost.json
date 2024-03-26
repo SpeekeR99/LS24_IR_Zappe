@@ -1,0 +1,18 @@
+{
+    "title": [
+        "Obratnost"
+    ],
+    "toc": [],
+    "h1": [],
+    "h2": [
+        " Úroveň 1",
+        " Úroveň 2",
+        " Úroveň 3",
+        " Úroveň 4",
+        " Úroveň 5"
+    ],
+    "h3": [],
+    "content": [
+        "Obratnost\n\nAtribut definující fyzickou obratnost hráče a klíčový atribut k rozvíjení rychlého stylu boje s mečem. Dále se dělí na pět úrovní:\n\nÚroveň 1 | Úroveň 2 | Úroveň 3 | Úroveň 4 | Úroveň 5\n Úroveň 1\n\nObratnost (úroveň 1)\nÚtok + 5%\nÚnik + 5%\nOdolnost vůči Oslepení + 5%\nOdolnost vůči Podpálení + 5%\n\t\n\nStahování\nUmožní získávání ingredienci z mrtvých těl\nRozšířením stahování je anatomie\nSchopnost vyplývající z děje příbéhu\n\t\n\nPredátor\nÚtok + 50%\nÚnik + 50%\nFunguje pouze od půlnoci do rozbřesku\nVyžaduje vypití mutagenu\n Úroveň 2\n\nObratnost (úroveň 2)\nÚtok + 5%\nÚnik + 5%\nOdolnost vůči Oslepení + 5%\nOdolnost vůči Podpálení + 5%\n\t\n\nOdrážení Střel\nHrdina dokáže odrážet střely z kuší a luků\n\t\n\nOdrážení\nKrytí + 10%\n\t\n\nBoj Zblízka\nOdemkne všechny údery boje zblízka\n Úroveň 3\n\nObratnost (úroveň 3)\nÚtok + 10%\nÚnik + 10%\nKrytí + 5%\nOdolnost vůči Oslepení + 10%\nOdolnost vůči Podpálení + 10%\nOdemkne 4. úroveň rychlých stylů (ocelový a stříbrný)\n\t\n\nOdolnost vůči Oslepení\nOdolnost vůči Oslepení + 50%\n\t\n\nKoordinace\nÚnik + 20%\n\t\n\nPřerušení Podpálení\nŠance na přerušení Podpálení + 50%\n Úroveň 4\n\nObratnost (úroveň 4)\nÚtok + 10%\nÚnik + 10%\nKrytí + 5%\nOdolnost vůči Oslepení + 10%\nOdolnost vůči Podpálení + 10%\nOdemkne 5. úroveň rychlých stylů (ocelový a stříbrný)\n\t\n\nFinesa\nBolest + 15%\nFunguje pouze při použití rychlého stylu\n\t\n\nFinta\nÚtok + 20%\n\t\n\nOdolnost vůči Podpálení\nDoba hoření - 50%\n Úroveň 5\n\nObratnost (úroveň 5)\nÚtok + 20%\nÚnik + 20%\nKrytí + 10%\nOdolnost vůči Oslepení + 20%\nOdolnost vůči Podpálení + 20%\n\t\n\nObezřetnost\nÚnik + 50%\nFunguje pouze tehdy, kdýz na zaklínače někdo zaútočí zezadu\n\t\n\nPrecizní Úder\nPřesný zásah + 25%\nFunguje pouze při použití skupinového stylu"
+    ]
+}

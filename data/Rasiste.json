@@ -1,0 +1,32 @@
+{
+    "title": [
+        "Rasisté"
+    ],
+    "toc": [
+        "Obsah\n1\tNávod\n2\tPoznámky\n3\tFáze\n3.1\tBoj\n3.2\tPomoc\n3.3\tPomoc"
+    ],
+    "h1": [],
+    "h2": [
+        "Rasisté",
+        "Popis",
+        "Obsah",
+        "Návod",
+        "Poznámky",
+        "Fáze"
+    ],
+    "h3": [
+        "Akt(y)",
+        "Zadavatel",
+        "Lokace",
+        "Postavy",
+        "Odměna",
+        "Související\núkoly",
+        "ID",
+        "Boj",
+        "Pomoc",
+        "Pomoc"
+    ],
+    "content": [
+        "Rasisté\nPopis\nAkt(y)\nAkt I\nZadavatel\nspouští automaticky\nLokace\nPodhradí\nPostavy\nZoltan Chivay\nOdměna\n2000 XP\nSouvisející\núkoly\nHra v kostky\nID\nq1006_rasists\n\nRasisté je vedlejší úkol v I. Kapitole. Geralt, při romantické procházce v přístavu Podhradí Wyzimy, spatří tlupu banditů a zrzavého trpaslíka v rozhořčeném dialogu.\n\nObsah\n1\tNávod\n2\tPoznámky\n3\tFáze\n3.1\tBoj\n3.2\tPomoc\n3.3\tPomoc\nNávod\n\nZvědavý zaklínač přijde blíž a započne dialog, ve kterém se může rozhodnout vmísit se do situace anebo je neřešit a odejít.\n\nPokud se rozhodne vmísit, pak započne boj, ve kterém společně s trpaslíkem porazí bandity.\n\nTrpaslík poděkuje a představí se jako Zoltan Chivay. Úkol je tímto splněn.\n\nPoznámky\nPokud Geralt obere bandity, najde u nich kostky, na které se pak může zeptat Zoltana. Započne tak úkol Hra v kostky. Tento úkol pak trvá celou hru; průchodem kapitolami a rozpravami se správnými lidmi se aktualizují fáze úkolu.\nPokud se Geralt rozhodne nemísit do boje a pak si sedne k ohni, začne meditovat anebo vstoupí do nějakého domu, Zoltanovi i banditům se resetuje pozice a nepohnou se. Se Zoltanem tak nelze začít žádný dialog.\nToto se dá vyřešit počkáním do noci, kdy už Geralt může tasit meč a jednoduše zaútočit na bandity. Zoltan pak poděkuje, jakoby se Geralt vmísil už od začátku - úkol se tak započne a okamžitě splní ve fázi \"Pomoc\".\nFáze\nPokud se Geralt rozhodne pomoci trpaslíkovi\n\nBoj\n\nNemínil jsem jen tak přihlížet, jak ti rasisté mučí trpaslíka.\n\nRozhodl jsem se vložit do hádky mezi rasisty a trpaslíkem.\nPomoc\n\nPomohl jsem Zoltanovi v boji s rasisty. Musím si s trpaslíkem promluvit\n\nPomohl jsem Zoltanovi v boji s rasisty\nPokud se Geralt odmítne míchat do boje, přesto pak však zabije bandity\n\nPomoc\n\nPomohl jsem Zoltanovi v boji s rasisty. Musím si s trpaslíkem promluvit\n\nPomohl jsem Zoltanovi v boji s rasisty"
+    ]
+}

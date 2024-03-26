@@ -1,0 +1,14 @@
+{
+    "title": [
+        "Meditace"
+    ],
+    "toc": [],
+    "h1": [],
+    "h2": [
+        "Poznámky"
+    ],
+    "h3": [],
+    "content": [
+        "Ve hře Zaklínač, Geralt ve hře Zaklínač nespí, ale medituje. Nejprve musí nalézt místo pro svou meditaci - některá ohniště nebo některé domy (při dialogu speciální ikona pro odpočinek).\n\nPři meditaci se snižuje zaklínačova opilost, toxicita elixírů v těle, doplňuje se zdraví. Také pouze při meditaci se může hráč věnovat alchymii, alokovat nové talenty a měnit nastavení medailonu (na vše je potřeba 1 hodina). Maximální doba meditace je 24 hodin.\n\nDoba meditace se dá nastavovat s přesností na hodiny, hráč ji začne stisknutím ikony přesýpacích hodin.\n\nThe slider to the right of the hourglass is used to select how long (in number of hours) Geralt should meditate. Alternatively, one of the four \"time of day\" icons can be selected to meditovat \"do svítání\", \"do poledne\", \"do setmění\" or \"do půlnoci\".\n\nClicking on the hourglass in the centre initiates the period of meditation.\n\n\n\n\nPoznámky\n\nIf Geralt is brewing potions (or making other alchemical items), or allocating talents, the hour necessary for brewing potions or allocating the talents is automatically added to the number of hours remaining until the desired time of day. So be careful when trying to make a specific appointment."
+    ]
+}

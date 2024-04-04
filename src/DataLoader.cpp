@@ -1,5 +1,7 @@
 #include "DataLoader.h"
 
+int DataLoader::id_counter = 0;
+
 json DataLoader::load_json(const std::string &path) {
     std::ifstream input(path);
     json data;
@@ -12,7 +14,7 @@ Document DataLoader::load_json_document(const std::string &path) {
     json data;
     input >> data;
     return {
-            0,
+            DataLoader::id_counter++,
             data["title"][0],
             data["toc"].get<std::vector<std::string>>(),
             data["h1"].get<std::vector<std::string>>(),

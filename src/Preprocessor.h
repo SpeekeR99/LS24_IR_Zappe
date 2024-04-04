@@ -127,5 +127,12 @@ public:
      * Preprocess the given vector of words, phrases or sentences
      */
     std::vector<std::string> preprocess_text(const std::vector<std::string> &text, bool lemma=true, bool content=false);
+
+    /**
+     * Parse the given boolean query
+     * @param query Boolean query
+     * @return Subqueries of the boolean query
+     */
+    std::vector<std::string> parse_bool_query(const std::string &query);
 };
 

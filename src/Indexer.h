@@ -88,12 +88,18 @@ public:
      */
     [[nodiscard]] float cosine_similarity(const std::map<std::string, float> &query, int doc_id, bool title = false) const;
     /**
-     * Search for the given query
+     * Search for the given query (VECTOR MODEL)
      * @param query Query
      * @param k Top k results
      * @return IDs of the top k documents and their scores
      */
     [[nodiscard]] std::pair<std::vector<int>, std::vector<float>> search(const std::vector<std::string> &query, int k) const;
+    /**
+     * Search for the given query (BOOLEAN MODEL)
+     * @param query Query
+     * @return IDs of the documents that fulfill the query conditions
+     */
+    [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query);
 
     /**
      * Get the size of the collection

@@ -254,3 +254,15 @@ std::vector<std::string> Preprocessor::preprocess_text(const std::vector<std::st
     std::string combined = std::accumulate(text.begin(), text.end(), std::string(" "));
     return preprocess_text(combined, lemma, content);
 }
+
+std::vector<std::string> Preprocessor::parse_bool_query(const string &query) {
+    /* For now, just split the query by spaces */
+    std::vector<std::string> tokens;
+    std::istringstream iss(query);
+    std::string token;
+
+    while (iss >> token)
+        tokens.push_back(token);
+
+    return tokens;
+}

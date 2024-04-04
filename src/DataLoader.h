@@ -14,6 +14,9 @@ using json = nlohmann::json;
  */
 class DataLoader {
 public:
+    /** ID counter for documents */
+    static int id_counter;
+
     /**
      * Load JSON from the given path
      * @param path Filepath to the JSON file

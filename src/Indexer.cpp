@@ -147,6 +147,20 @@ std::pair<std::vector<int>, std::vector<float>> Indexer::search(const std::vecto
     return top_k;
 }
 
+std::vector<int> Indexer::search(const std::vector<std::string> &query) {
+    /* For now, implict OR */
+    std::vector<int> results;
+
+    for (const auto &subquery : query) {
+        if (this->index.find(subquery) != this->index.end()) {
+            for (const auto &[doc_id, _] : this->index.at(subquery).doc_tf_idf)
+                results.emplace_back(doc_id);
+        }
+    }
+
+    return results;
+}
+
 int Indexer::get_collection_size() const {
     return static_cast<int>(this->collection.size());
 }

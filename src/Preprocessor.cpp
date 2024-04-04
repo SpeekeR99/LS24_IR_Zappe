@@ -255,40 +255,91 @@ std::vector<std::string> Preprocessor::preprocess_text(const std::vector<std::st
     return preprocess_text(combined, lemma, content);
 }
 
-std::tuple<std::vector<std::string>, std::vector<std::string>> Preprocessor::parse_bool_query(const string &query) {
+int precedence(const std::string &op) {
+    if (op == operators_map[Operator::NOT])
+        return 3;
+    if (op == operators_map[Operator::AND])
+        return 2;
+    if (op == operators_map[Operator::OR])
+        return 1;
+    return 0;
+}
+
+std::vector<std::string> Preprocessor::parse_bool_query(const string &query) {
+    // Preprocess the query to add spaces around parentheses
+    std::string preprocessed_query;
+    for (char c : query) {
+        if (c == '(' || c == ')') {
+            preprocessed_query += ' ';
+            preprocessed_query += c;
+            preprocessed_query += ' ';
+        } else {
+            preprocessed_query += c;
+        }
+    }
+
     std::vector<std::string> tokens;
     std::vector<std::string> operators;
-    std::istringstream iss(query);
+    std::istringstream iss(preprocessed_query);
     std::string token;
 
     bool first = true;
     bool is_operator = false;
+    bool is_and_or = false;
 
     while (iss >> token) {
-        if (token == operators_map[Operator::AND] || token == operators_map[Operator::OR]) {
-            if (first || is_operator) {
-                std::cerr << "[ERROR] Invalid boolean query!" << std::endl;
-                return {tokens, operators};
-            }
+        if (token == "(") {
+            operators.push_back(token);
             is_operator = true;
-            operators.emplace_back(token);
-        }
-        else if (token == operators_map[Operator::NOT]) {
+            is_and_or = false;
+        } else if (token == ")") {
+            while (!operators.empty() && operators.back() != "(") {
+                tokens.push_back(operators.back());
+                operators.pop_back();
+            }
+            if (!operators.empty())
+                operators.pop_back(); // pop the "("
+            is_operator = true;
+            is_and_or = false;
+        } else if (token == operators_map[Operator::AND] || token == operators_map[Operator::OR]) {
+            if (first || is_and_or) {
+                std::cerr << "[ERROR] Invalid query" << std::endl;
+                return {};
+            }
+            while (!operators.empty() && precedence(operators.back()) >= precedence(token)) {
+                tokens.push_back(operators.back());
+                operators.pop_back();
+            }
+            operators.push_back(token);
+            is_operator = true;
+            is_and_or = true;
+        } else if (token == operators_map[Operator::NOT]) {
             if (!operators.empty() && operators.back() == operators_map[Operator::NOT])
-                /* NOT NOT is the same as no NOT */
                 operators.pop_back();
             else
-                operators.emplace_back(token);
-        }
-        else {
-            if (!first && !is_operator)
-                /* Implicit OR */
-                operators.emplace_back(operators_map[Operator::OR]);
-            first = false;
+                operators.push_back(token);
+            is_operator = true;
+            is_and_or = false;
+        } else {
+            if (!first && !is_operator) {
+                // If the previous token was not an operator, insert an implicit OR
+                while (!operators.empty() && precedence(operators.back()) >= precedence(operators_map[Operator::OR])) {
+                    tokens.push_back(operators.back());
+                    operators.pop_back();
+                }
+                operators.push_back(operators_map[Operator::OR]);
+            }
+            tokens.push_back(token);
             is_operator = false;
-            tokens.emplace_back(token);
+            is_and_or = false;
         }
+        first = false;
     }
 
-    return {tokens, operators};
+    while (!operators.empty()) {
+        tokens.push_back(operators.back());
+        operators.pop_back();
+    }
+
+    return tokens;
 }

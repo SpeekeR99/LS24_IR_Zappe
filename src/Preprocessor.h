@@ -148,10 +148,10 @@ public:
     std::vector<std::string> preprocess_text(const std::vector<std::string> &text, bool lemma=true, bool content=false);
 
     /**
-     * Parse the given boolean query
+     * Parse the given boolean query into postfix notation
      * @param query Boolean query
-     * @return Words and operators
+     * @return Postfix notation of the query
      */
-    std::tuple<std::vector<std::string>, std::vector<std::string>> parse_bool_query(const std::string &query);
+    std::vector<std::string> parse_bool_query(const std::string &query);
 };
 

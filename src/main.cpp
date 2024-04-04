@@ -95,19 +95,13 @@ int main() {
     print_query_results(query, result, indexer, doc_cache);
 
     /* Search "Geralt z Rivie" boolean */
-    query = "Geralt z NOT NOT Rivie";
-    std::vector<std::string> bool_tokens;
-    std::vector<std::string> bool_ops;
-    std::tie(bool_tokens, bool_ops) = preprocessor.parse_bool_query(query);
+    query = "NOT Geralt OR (z AND NOT NOT Rivie)";
+    auto bool_tokens = preprocessor.parse_bool_query(query);
 
     std::cout << query << std::endl;
 
     for (auto &token : bool_tokens)
         std::cout << token << " ";
-    std::cout << std::endl;
-
-    for (auto &op : bool_ops)
-        std::cout << op << " ";
     std::cout << std::endl;
 
 //    auto result_ids = indexer.search(bool_tokens, bool_ops);

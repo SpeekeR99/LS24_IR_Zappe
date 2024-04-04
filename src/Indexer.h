@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TF_IDF.h"
+#include "Preprocessor.h"
 
 /**
  * Class for indexing the documents
@@ -96,10 +97,11 @@ public:
     [[nodiscard]] std::pair<std::vector<int>, std::vector<float>> search(const std::vector<std::string> &query, int k) const;
     /**
      * Search for the given query (BOOLEAN MODEL)
-     * @param query Query
+     * @param query_tokens Query tokens
+     * @param operators Query operators
      * @return IDs of the documents that fulfill the query conditions
      */
-    [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query);
+    [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query_tokens, const std::vector<std::string> &operators) const;
 
     /**
      * Get the size of the collection

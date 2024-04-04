@@ -147,18 +147,49 @@ std::pair<std::vector<int>, std::vector<float>> Indexer::search(const std::vecto
     return top_k;
 }
 
-std::vector<int> Indexer::search(const std::vector<std::string> &query) {
-    /* For now, implict OR */
-    std::vector<int> results;
+std::vector<int> Indexer::search(const std::vector<std::string> &query_tokens, const std::vector<std::string> &operators) const {
+    std::vector<std::vector<int>> sub_results;
 
-    for (const auto &subquery : query) {
+    for (const auto &subquery : query_tokens) {
         if (this->index.find(subquery) != this->index.end()) {
             for (const auto &[doc_id, _] : this->index.at(subquery).doc_tf_idf)
-                results.emplace_back(doc_id);
+                sub_results.emplace_back(doc_id);
         }
     }
 
-    return results;
+    for (int i = 0; i < operators.size(); i++) {
+        auto op = operators[i];
+        std::string next_op;
+        if (i + 1 < operators.size())
+            next_op = operators[i + 1];
+
+        auto subquery_1 = sub_results[0];
+        auto subquery_2 = sub_results[1];
+
+        if (next_op == operators_map[Operator::NOT]) {
+            std::vector<int> not_subquery;
+            for (auto &[doc_id, _] : this->norms) {
+                if (std::find(subquery_2.begin(), subquery_2.end(), doc_id) == subquery_2.end())
+                    not_subquery.emplace_back(doc_id);
+            }
+            sub_results[1] = not_subquery;
+            i++;
+        }
+
+        if (op == operators_map[Operator::AND]) {
+            auto intersection = std::vector<int>();
+            std::set_intersection(subquery_1.begin(), subquery_1.end(), subquery_2.begin(), subquery_2.end(), std::back_inserter(intersection));
+            sub_results[0] = intersection;
+            std::remove(sub_results.begin(), sub_results.end(), subquery_2);
+        } else if (op == operators_map[Operator::OR]) {
+            auto union_ = std::vector<int>();
+            std::set_union(subquery_1.begin(), subquery_1.end(), subquery_2.begin(), subquery_2.end(), std::back_inserter(union_));
+            sub_results[0] = union_;
+            std::remove(sub_results.begin(), sub_results.end(), subquery_2);
+        }
+    }
+
+    return sub_results[0];
 }
 
 int Indexer::get_collection_size() const {

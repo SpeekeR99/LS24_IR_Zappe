@@ -95,13 +95,27 @@ int main() {
     print_query_results(query, result, indexer, doc_cache);
 
     /* Search "Geralt z Rivie" boolean */
-    query_tokens = preprocessor.parse_bool_query(query);
-    auto result_ids = indexer.search(query_tokens);
-    std::cout << "Documents that contain \"Geralt z Rivie\":" << std::endl;
-    std::cout << "Found " << result_ids.size() << " documents" << std::endl << "Results:" << std::endl;
-    for (auto &doc_id : result_ids)
-        std::cout << "ID: " << doc_id << ", Title: " << doc_cache.at(doc_id).title << std::endl;
+    query = "Geralt z NOT NOT Rivie";
+    std::vector<std::string> bool_tokens;
+    std::vector<std::string> bool_ops;
+    std::tie(bool_tokens, bool_ops) = preprocessor.parse_bool_query(query);
+
+    std::cout << query << std::endl;
+
+    for (auto &token : bool_tokens)
+        std::cout << token << " ";
     std::cout << std::endl;
+
+    for (auto &op : bool_ops)
+        std::cout << op << " ";
+    std::cout << std::endl;
+
+//    auto result_ids = indexer.search(bool_tokens, bool_ops);
+//    std::cout << "Documents that contain \"" << query << "\":" << std::endl;
+//    std::cout << "Found " << result_ids.size() << " documents" << std::endl << "Results:" << std::endl;
+//    for (auto &doc_id : result_ids)
+//        std::cout << "ID: " << doc_id << ", Title: " << doc_cache.at(doc_id).title << std::endl;
+//    std::cout << std::endl;
 
     return EXIT_SUCCESS;
 }

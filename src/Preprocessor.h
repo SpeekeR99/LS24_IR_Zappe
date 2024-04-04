@@ -7,10 +7,29 @@
 #include <numeric>
 #include <set>
 #include <map>
+#include <tuple>
 
 #include "libstemmer.h"
 #include "RdrLemmatizer.h"
 #include "sl_lemmatizer.h"
+
+/**
+ * Operator for boolean queries
+ */
+enum Operator {
+    AND = 0,
+    OR,
+    NOT
+};
+
+/**
+ * Map of operators and their string representations
+ */
+static const char * const operators_map[] = {
+    [AND] = "AND",
+    [OR] = "OR",
+    [NOT] = "NOT"
+};
 
 /**
  * Class for preprocessing the Witcher crawled data
@@ -131,8 +150,8 @@ public:
     /**
      * Parse the given boolean query
      * @param query Boolean query
-     * @return Subqueries of the boolean query
+     * @return Words and operators
      */
-    std::vector<std::string> parse_bool_query(const std::string &query);
+    std::tuple<std::vector<std::string>, std::vector<std::string>> parse_bool_query(const std::string &query);
 };
 

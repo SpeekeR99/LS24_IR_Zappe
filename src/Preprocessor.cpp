@@ -255,14 +255,40 @@ std::vector<std::string> Preprocessor::preprocess_text(const std::vector<std::st
     return preprocess_text(combined, lemma, content);
 }
 
-std::vector<std::string> Preprocessor::parse_bool_query(const string &query) {
-    /* For now, just split the query by spaces */
+std::tuple<std::vector<std::string>, std::vector<std::string>> Preprocessor::parse_bool_query(const string &query) {
     std::vector<std::string> tokens;
+    std::vector<std::string> operators;
     std::istringstream iss(query);
     std::string token;
 
-    while (iss >> token)
-        tokens.push_back(token);
+    bool first = true;
+    bool is_operator = false;
 
-    return tokens;
+    while (iss >> token) {
+        if (token == operators_map[Operator::AND] || token == operators_map[Operator::OR]) {
+            if (first || is_operator) {
+                std::cerr << "[ERROR] Invalid boolean query!" << std::endl;
+                return {tokens, operators};
+            }
+            is_operator = true;
+            operators.emplace_back(token);
+        }
+        else if (token == operators_map[Operator::NOT]) {
+            if (!operators.empty() && operators.back() == operators_map[Operator::NOT])
+                /* NOT NOT is the same as no NOT */
+                operators.pop_back();
+            else
+                operators.emplace_back(token);
+        }
+        else {
+            if (!first && !is_operator)
+                /* Implicit OR */
+                operators.emplace_back(operators_map[Operator::OR]);
+            first = false;
+            is_operator = false;
+            tokens.emplace_back(token);
+        }
+    }
+
+    return {tokens, operators};
 }

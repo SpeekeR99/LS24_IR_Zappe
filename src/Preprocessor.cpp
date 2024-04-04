@@ -329,7 +329,8 @@ std::vector<std::string> Preprocessor::parse_bool_query(const string &query) {
                 }
                 operators.push_back(operators_map[Operator::OR]);
             }
-            tokens.push_back(token);
+            auto preprocessed_token = preprocess_text(token, true, false);
+            tokens.push_back(preprocessed_token[0]);
             is_operator = false;
             is_and_or = false;
         }

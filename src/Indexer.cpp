@@ -147,49 +147,45 @@ std::pair<std::vector<int>, std::vector<float>> Indexer::search(const std::vecto
     return top_k;
 }
 
-std::vector<int> Indexer::search(const std::vector<std::string> &query_tokens, const std::vector<std::string> &operators) const {
-    std::vector<std::vector<int>> sub_results;
+std::vector<int> Indexer::search(const std::vector<std::string> &query_tokens) const {
+    std::vector<std::vector<int>> results;
 
-    for (const auto &subquery : query_tokens) {
-        if (this->index.find(subquery) != this->index.end()) {
-            for (const auto &[doc_id, _] : this->index.at(subquery).doc_tf_idf)
-                sub_results.emplace_back(doc_id);
-        }
-    }
-
-    for (int i = 0; i < operators.size(); i++) {
-        auto op = operators[i];
-        std::string next_op;
-        if (i + 1 < operators.size())
-            next_op = operators[i + 1];
-
-        auto subquery_1 = sub_results[0];
-        auto subquery_2 = sub_results[1];
-
-        if (next_op == operators_map[Operator::NOT]) {
-            std::vector<int> not_subquery;
-            for (auto &[doc_id, _] : this->norms) {
-                if (std::find(subquery_2.begin(), subquery_2.end(), doc_id) == subquery_2.end())
-                    not_subquery.emplace_back(doc_id);
+    for (const auto &token : query_tokens) {
+        if (token == operators_map[Operator::AND]) {
+            auto result_2 = results.back();
+            results.pop_back();
+            auto result_1 = results.back();
+            results.pop_back();
+            auto result = std::vector<int>();
+            std::set_intersection(result_1.begin(), result_1.end(), result_2.begin(), result_2.end(), std::back_inserter(result));
+            results.emplace_back(result);
+        } else if (token == operators_map[Operator::OR]) {
+            auto result_2 = results.back();
+            results.pop_back();
+            auto result_1 = results.back();
+            results.pop_back();
+            auto result = std::vector<int>();
+            std::set_union(result_1.begin(), result_1.end(), result_2.begin(), result_2.end(), std::back_inserter(result));
+            results.emplace_back(result);
+        } else if (token == operators_map[Operator::NOT]) {
+            auto result = results.back();
+            results.pop_back();
+            auto not_result = std::vector<int>();
+            for (auto &doc : this->collection)
+                if (std::find(result.begin(), result.end(), doc.id) == result.end())
+                    not_result.emplace_back(doc.id);
+            results.emplace_back(not_result);
+        } else {
+            if (this->index.find(token) != this->index.end()) {
+                auto result = std::vector<int>();
+                for (const auto &[doc_id, _] : this->index.at(token).doc_tf_idf)
+                    result.emplace_back(doc_id);
+                results.emplace_back(result);
             }
-            sub_results[1] = not_subquery;
-            i++;
-        }
-
-        if (op == operators_map[Operator::AND]) {
-            auto intersection = std::vector<int>();
-            std::set_intersection(subquery_1.begin(), subquery_1.end(), subquery_2.begin(), subquery_2.end(), std::back_inserter(intersection));
-            sub_results[0] = intersection;
-            std::remove(sub_results.begin(), sub_results.end(), subquery_2);
-        } else if (op == operators_map[Operator::OR]) {
-            auto union_ = std::vector<int>();
-            std::set_union(subquery_1.begin(), subquery_1.end(), subquery_2.begin(), subquery_2.end(), std::back_inserter(union_));
-            sub_results[0] = union_;
-            std::remove(sub_results.begin(), sub_results.end(), subquery_2);
         }
     }
 
-    return sub_results[0];
+    return results.back();
 }
 
 int Indexer::get_collection_size() const {

@@ -98,10 +98,9 @@ public:
     /**
      * Search for the given query (BOOLEAN MODEL)
      * @param query_tokens Query tokens
-     * @param operators Query operators
      * @return IDs of the documents that fulfill the query conditions
      */
-    [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query_tokens, const std::vector<std::string> &operators) const;
+    [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query_tokens) const;
 
     /**
      * Get the size of the collection

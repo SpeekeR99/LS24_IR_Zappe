@@ -95,7 +95,7 @@ int main() {
     print_query_results(query, result, indexer, doc_cache);
 
     /* Search "Geralt z Rivie" boolean */
-    query = "NOT Geralt OR (z AND NOT NOT Rivie)";
+    query = "NOT Geralt AND Geralt";
     auto bool_tokens = preprocessor.parse_bool_query(query);
 
     std::cout << query << std::endl;
@@ -104,12 +104,12 @@ int main() {
         std::cout << token << " ";
     std::cout << std::endl;
 
-//    auto result_ids = indexer.search(bool_tokens, bool_ops);
-//    std::cout << "Documents that contain \"" << query << "\":" << std::endl;
-//    std::cout << "Found " << result_ids.size() << " documents" << std::endl << "Results:" << std::endl;
-//    for (auto &doc_id : result_ids)
-//        std::cout << "ID: " << doc_id << ", Title: " << doc_cache.at(doc_id).title << std::endl;
-//    std::cout << std::endl;
+    auto result_ids = indexer.search(bool_tokens);
+    std::cout << "Documents that contain \"" << query << "\":" << std::endl;
+    std::cout << "Found " << result_ids.size() << " documents" << std::endl << "Results:" << std::endl;
+    for (auto &doc_id : result_ids)
+        std::cout << "ID: " << doc_id << ", Title: " << doc_cache.at(doc_id).title << std::endl;
+    std::cout << std::endl;
 
     return EXIT_SUCCESS;
 }

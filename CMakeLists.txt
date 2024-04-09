@@ -92,6 +92,8 @@ set(
 add_executable(
     cpp_tf_idf
     src/main.cpp
+    src/IndexHandler.h
+    src/IndexHandler.cpp
     src/Document.h
     src/DataLoader.h
     src/DataLoader.cpp

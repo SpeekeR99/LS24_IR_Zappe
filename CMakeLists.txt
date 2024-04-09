@@ -65,44 +65,44 @@ include_directories(lib/imgui/backends)
 include_directories(lib/imgui/misc/cpp)
 
 set(
-        imgui_files
-        lib/imgui/imconfig.h
-        lib/imgui/imgui.cpp
-        lib/imgui/imgui.h
-        lib/imgui/imgui_draw.cpp
-        lib/imgui/imgui_internal.h
-        lib/imgui/imgui_tables.cpp
-        lib/imgui/imgui_widgets.cpp
-        lib/imgui/imstb_rectpack.h
-        lib/imgui/imstb_textedit.h
-        lib/imgui/imstb_truetype.h
-        lib/imgui/misc/cpp/imgui_stdlib.cpp
-        lib/imgui/misc/cpp/imgui_stdlib.h
+    imgui_files
+    lib/imgui/imconfig.h
+    lib/imgui/imgui.cpp
+    lib/imgui/imgui.h
+    lib/imgui/imgui_draw.cpp
+    lib/imgui/imgui_internal.h
+    lib/imgui/imgui_tables.cpp
+    lib/imgui/imgui_widgets.cpp
+    lib/imgui/imstb_rectpack.h
+    lib/imgui/imstb_textedit.h
+    lib/imgui/imstb_truetype.h
+    lib/imgui/misc/cpp/imgui_stdlib.cpp
+    lib/imgui/misc/cpp/imgui_stdlib.h
 )
 
 set(
-        imgui_impl_files
-        lib/imgui/backends/imgui_impl_glfw.cpp
-        lib/imgui/backends/imgui_impl_glfw.h
-        lib/imgui/backends/imgui_impl_opengl3.cpp
-        lib/imgui/backends/imgui_impl_opengl3.h
-        lib/imgui/backends/imgui_impl_opengl3_loader.h
+    imgui_impl_files
+    lib/imgui/backends/imgui_impl_glfw.cpp
+    lib/imgui/backends/imgui_impl_glfw.h
+    lib/imgui/backends/imgui_impl_opengl3.cpp
+    lib/imgui/backends/imgui_impl_opengl3.h
+    lib/imgui/backends/imgui_impl_opengl3_loader.h
 )
 
 add_executable(
     cpp_tf_idf
-    src/main.cpp
-    src/IndexHandler.h
-    src/IndexHandler.cpp
-    src/Document.h
-    src/DataLoader.h
-    src/DataLoader.cpp
-    src/Preprocessor.h
-    src/Preprocessor.cpp
-    src/TF_IDF.h
-    src/TF_IDF.cpp
-    src/Indexer.h
-    src/Indexer.cpp
+    src/cpp_indexer/Main.cpp
+    src/cpp_indexer/IndexHandler.h
+    src/cpp_indexer/IndexHandler.cpp
+    src/cpp_indexer/Document.h
+    src/cpp_indexer/DataLoader.h
+    src/cpp_indexer/DataLoader.cpp
+    src/cpp_indexer/Preprocessor.h
+    src/cpp_indexer/Preprocessor.cpp
+    src/cpp_indexer/TF_IDF.h
+    src/cpp_indexer/TF_IDF.cpp
+    src/cpp_indexer/Indexer.h
+    src/cpp_indexer/Indexer.cpp
     ${lemma_lib_src}
     ${stem_lib_src}
     ${imgui_files}

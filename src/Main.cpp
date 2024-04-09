@@ -15,6 +15,13 @@ int main() {
     /* Index documents */
     auto indexer = Indexer(docs, tokenized_docs);
 
+    /* Save the index */
+    IndexHandler::save_index(indexer, "../index/index1.json");
+
+    /* Load the index */
+    indexer = Indexer();
+    IndexHandler::load_index(indexer, "../index/index1.json");
+
     /* Search "Geralt z Rivie" */
     std::string query = "Geralt z Rivie";
     auto result = IndexHandler::search(indexer, preprocessor, query, 3);

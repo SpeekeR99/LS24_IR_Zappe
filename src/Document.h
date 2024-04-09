@@ -2,6 +2,9 @@
 
 #include <vector>
 #include <string>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 /**
  * Class representing Document
@@ -27,6 +30,13 @@ public:
     std::string content;
 
     /**
+     * Default constructor
+     */
+    Document() : id(-1), title(), toc(), h1(), h2(), h3(), content() {
+        /* Nothing to do here :) */
+    }
+
+    /**
      * Constructor
      * @param id ID
      * @param title Title
@@ -47,6 +57,35 @@ public:
     ) :
             id(id), title(std::move(title)), toc(toc), h1(h1), h2(h2), h3(h3), content(std::move(content)) {
         /* Nothing to do here :) */
+    }
+
+    /**
+     * Convert the document to JSON
+     * @return JSON object
+     */
+    [[nodiscard]] json to_json() const {
+        return {
+            {"id", id},
+            {"title", title},
+            {"toc", toc},
+            {"h1", h1},
+            {"h2", h2},
+            {"h3", h3},
+            {"content", content}
+        };
+    }
+    /**
+     * Convert the document from JSON
+     * @param data JSON object
+     */
+    void from_json(const json &data) {
+        id = data["id"];
+        title = data["title"];
+        toc = data["toc"].get<std::vector<std::string>>();
+        h1 = data["h1"].get<std::vector<std::string>>();
+        h2 = data["h2"].get<std::vector<std::string>>();
+        h3 = data["h3"].get<std::vector<std::string>>();
+        content = data["content"];
     }
 };
 
@@ -72,6 +111,13 @@ public:
     std::vector<std::string> content;
 
     /**
+     * Default constructor
+     */
+    TokenizedDocument() : id(-1), title(), toc(), h1(), h2(), h3(), content() {
+        /* Nothing to do here :) */
+    }
+
+    /**
      * Constructor
      * @param id ID
      * @param title Title
@@ -92,5 +138,34 @@ public:
     ) :
             id(id), title(title), toc(toc), h1(h1), h2(h2), h3(h3), content(content) {
         /* Nothing to do here :) */
+    }
+
+    /**
+     * Convert the document to JSON
+     * @return JSON object
+     */
+    [[nodiscard]] json to_json() const {
+        return {
+            {"id", id},
+            {"title", title},
+            {"toc", toc},
+            {"h1", h1},
+            {"h2", h2},
+            {"h3", h3},
+            {"content", content}
+        };
+    }
+    /**
+     * Convert the document from JSON
+     * @param data JSON object
+     */
+    void from_json(const json &data) {
+        id = data["id"];
+        title = data["title"];
+        toc = data["toc"].get<std::vector<std::string>>();
+        h1 = data["h1"].get<std::vector<std::string>>();
+        h2 = data["h2"].get<std::vector<std::string>>();
+        h3 = data["h3"].get<std::vector<std::string>>();
+        content = data["content"];
     }
 };

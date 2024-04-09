@@ -6,6 +6,7 @@
 #include <utility>
 #include <nlohmann/json.hpp>
 #include "Document.h"
+#include "Indexer.h"
 
 using json = nlohmann::json;
 
@@ -41,4 +42,17 @@ public:
      * @return Vector of Document objects
      */
     static std::vector<Document> load_json_documents_from_dir(const std::string &path);
+
+    /**
+     * Save the index to the given path
+     * @param indexer Indexer object
+     * @param index_path Index path
+     */
+    static void save_index_to_file(Indexer &indexer, const std::string &index_path);
+    /**
+     * Load the index from the given path
+     * @param indexer Indexer object
+     * @param index_path Index path
+     */
+    static void load_index_from_file(Indexer &indexer, const std::string &index_path);
 };

@@ -24,6 +24,20 @@ public:
     static std::vector<TokenizedDocument> preprocess_documents(Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose=true);
 
     /**
+     * Save the index to the given path
+     * @param indexer Indexer
+     * @param index_path Index path
+     */
+    static void save_index(Indexer &indexer, const std::string &index_path);
+
+    /**
+     * Load the index from the given path
+     * @param indexer Indexer
+     * @param index_path Index path
+     */
+    static void load_index(Indexer &indexer, const std::string &index_path);
+
+    /**
      * Add documents to the indexer and cache
      * @param indexer Indexer
      * @param preprocessor Preprocessor object instance

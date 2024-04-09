@@ -42,6 +42,26 @@ std::vector<TokenizedDocument> IndexHandler::preprocess_documents(Preprocessor &
     return tokenized_docs;
 }
 
+void IndexHandler::save_index(Indexer &indexer, const string &index_path) {
+    std::cout << "Saving index to " << index_path << "..." << std::endl;
+    auto t_start = std::chrono::high_resolution_clock::now();
+
+    DataLoader::save_index_to_file(indexer, index_path);
+
+    auto t_end = std::chrono::high_resolution_clock::now();
+    std::cout << "Index saved in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
+}
+
+void IndexHandler::load_index(Indexer &indexer, const string &index_path) {
+    std::cout << "Loading index from " << index_path << "..." << std::endl;
+    auto t_start = std::chrono::high_resolution_clock::now();
+
+    DataLoader::load_index_from_file(indexer, index_path);
+
+    auto t_end = std::chrono::high_resolution_clock::now();
+    std::cout << "Index loaded in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
+}
+
 void IndexHandler::add_docs(Indexer &indexer, Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose) {
     if (verbose) {
         std::cout << "Adding new documents..." << std::endl << "IDs: ";

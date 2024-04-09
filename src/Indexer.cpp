@@ -218,6 +218,48 @@ std::vector<int> Indexer::search(const std::vector<std::string> &query_tokens) c
     return results.back();
 }
 
+json Indexer::to_json() const {
+    json j;
+    j["collection"] = json::array();
+    for (const auto &doc : this->collection)
+        j["collection"].push_back(doc.to_json());
+    j["doc_cache"] = json::array();
+    for (const auto &[id, doc] : this->doc_cache)
+        j["doc_cache"].push_back(doc.to_json());
+    j["index"] = json::object();
+    for (const auto &[word, element] : this->index)
+        j["index"][word] = element.to_json();
+    j["title_index"] = json::object();
+    for (const auto &[word, element] : this->title_index)
+        j["title_index"][word] = element.to_json();
+    j["norms"] = this->norms;
+    j["title_norms"] = this->title_norms;
+    return j;
+}
+
+void Indexer::from_json(const json &j) {
+    auto temp = j.at("collection");
+    for (const auto &doc : temp) {
+        TokenizedDocument temp_doc;
+        temp_doc.from_json(doc);
+        this->collection.emplace_back(temp_doc);
+    }
+    temp = j.at("doc_cache");
+    for (const auto &doc : temp) {
+        Document temp_doc;
+        temp_doc.from_json(doc);
+        this->doc_cache.insert({temp_doc.id, temp_doc});
+    }
+    temp = j.at("index");
+    for (const auto &element : temp.items())
+        this->index.insert({element.key(), map_element::from_json(element.value())});
+    temp = j.at("title_index");
+    for (const auto &element : temp.items())
+        this->title_index.insert({element.key(), map_element::from_json(element.value())});
+    this->norms = j.at("norms").get<std::map<int, float>>();
+    this->title_norms = j.at("title_norms").get<std::map<int, float>>();
+}
+
 int Indexer::get_collection_size() const {
     return static_cast<int>(this->collection.size());
 }

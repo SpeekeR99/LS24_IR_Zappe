@@ -39,3 +39,18 @@ std::vector<Document> DataLoader::load_json_documents_from_dir(const std::string
             documents.push_back(load_json_document(entry.path().string()));
     return documents;
 }
+
+void DataLoader::save_index_to_file(Indexer &indexer, const string &index_path) {
+    std::ofstream output(index_path);
+    json data = indexer.to_json();
+    output << data.dump(1);
+    output.close();
+}
+
+void DataLoader::load_index_from_file(Indexer &indexer, const string &index_path) {
+    std::ifstream input(index_path);
+    json data;
+    input >> data;
+    indexer.from_json(data);
+    input.close();
+}

@@ -2,8 +2,11 @@
 
 #include <chrono>
 #include <unordered_map>
+#include <nlohmann/json.hpp>
 #include "TF_IDF.h"
 #include "Preprocessor.h"
+
+using json = nlohmann::json;
 
 /**
  * Class for indexing the documents
@@ -107,6 +110,17 @@ public:
      * @return IDs of the documents that fulfill the query conditions
      */
     [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query_tokens) const;
+
+    /**
+     * Indexer to json
+     * @return JSON representation of the indexer
+     */
+    [[nodiscard]] json to_json() const;
+    /**
+     * Load indexer from json
+     * @param j JSON representation of the indexer
+     */
+    void from_json(const json &j);
 
     /**
      * Get the size of the collection

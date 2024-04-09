@@ -27,7 +27,9 @@ class WitcherCrawler:
         """
         Initialize the web driver
         """
-        self.driver = webdriver.Firefox()
+        options = webdriver.FirefoxOptions()
+        options.add_argument('--headless')
+        self.driver = webdriver.Firefox(options=options)
 
     def quit(self):
         """

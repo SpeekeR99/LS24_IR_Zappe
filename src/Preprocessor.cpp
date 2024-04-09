@@ -68,7 +68,7 @@ bool Preprocessor::prepare_stemmer() {
 
     /* Check if stemmer was created */
     if (this->stemmer == nullptr) {
-        std::cerr << "[ERROR] Failed to create stemmer!" << std::endl;
+        std::cerr << "[ERROR]: Failed to create stemmer!" << std::endl;
         return false;
     }
 
@@ -79,7 +79,7 @@ bool Preprocessor::prepare_lemmatizer() {
     /* Load language library */
     char *file_name = const_cast<char *>(this->lemma_czech_bin.c_str());
     if (lem_load_language_library(file_name) != STATUS_OK) {
-        std::cerr << "[ERROR] Failed to open language library file!" << std::endl;
+        std::cerr << "[ERROR]: Failed to open language library file!" << std::endl;
         return false;
     }
 
@@ -255,7 +255,7 @@ std::vector<std::string> Preprocessor::preprocess_text(const std::vector<std::st
     return preprocess_text(combined, lemma, content);
 }
 
-int precedence(const std::string &op) {
+int Preprocessor::bool_op_precedence(const string &op) {
     if (op == operators_map[Operator::NOT])
         return 3;
     if (op == operators_map[Operator::AND])
@@ -303,10 +303,10 @@ std::vector<std::string> Preprocessor::parse_bool_query(const string &query) {
             is_and_or = false;
         } else if (token == operators_map[Operator::AND] || token == operators_map[Operator::OR]) {
             if (first || is_and_or) {
-                std::cerr << "[ERROR] Invalid query" << std::endl;
+                std::cerr << "[ERROR]: Invalid query" << std::endl;
                 return {};
             }
-            while (!operators.empty() && precedence(operators.back()) >= precedence(token)) {
+            while (!operators.empty() && bool_op_precedence(operators.back()) >= bool_op_precedence(token)) {
                 tokens.push_back(operators.back());
                 operators.pop_back();
             }
@@ -323,11 +323,11 @@ std::vector<std::string> Preprocessor::parse_bool_query(const string &query) {
         } else {
             if (!first && !is_operator) {
                 // If the previous token was not an operator, insert an implicit OR
-                while (!operators.empty() && precedence(operators.back()) >= precedence(operators_map[Operator::OR])) {
+                while (!operators.empty() && bool_op_precedence(operators.back()) >= bool_op_precedence(operators_map[Operator::OR])) {
                     tokens.push_back(operators.back());
                     operators.pop_back();
                 }
-                operators.push_back(operators_map[Operator::OR]);
+                operators.emplace_back(operators_map[Operator::OR]);
             }
             auto preprocessed_token = preprocess_text(token, true, false);
             tokens.push_back(preprocessed_token[0]);

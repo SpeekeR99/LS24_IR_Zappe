@@ -9,10 +9,18 @@ Indexer::Indexer(const std::vector<TokenizedDocument> &collection) : collection(
 }
 
 void Indexer::index_everything() {
+    std::cout << "Indexing documents..." << std::endl;
+    auto t_start = std::chrono::high_resolution_clock::now();
+
     this->norms.clear();
     this->title_norms.clear();
     this->index = TF_IDF::calc_tf_idf(this->collection, this->norms);
     this->title_index = TF_IDF::calc_tf_idf(this->collection, this->title_norms, true);
+
+    auto t_end = std::chrono::high_resolution_clock::now();
+    std::cout << "Indexed " << this->get_collection_size() << " documents and " << this->get_index_size() << " words using TF-IDF" << std::endl;
+    std::cout << "(Indexed " << this->get_title_index_size() << " words in titles using TF-IDF)" << std::endl;
+    std::cout << "Indexing done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
 }
 
 

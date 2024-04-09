@@ -40,8 +40,14 @@ private:
     const std::string language = "czech";
     /** Filepath to czech binary file for the lemmatizer */
     const std::string lemma_czech_bin = "../lib/lemma/lemmagen/dictionaries/czech.bin";
+    /** Lemmatizer instance for the czech language */
+    RdrLemmatizer *lemmatizer = nullptr;
+    /** Stemmer instance for the czech language */
+    struct sb_stemmer *stemmer = nullptr;
     /** Filepath to the file with stopwords */
     const std::string stopwords_file = "../src/czech.stop";
+    /** Stopwords */
+    std::set<std::string> stopwords;
 
     /**
      * Prepare the stemmer for the given language
@@ -54,19 +60,19 @@ private:
     */
     bool prepare_lemmatizer();
 
-    /** Lemmatizer instance for the czech language */
-    RdrLemmatizer *lemmatizer = nullptr;
-    /** Stemmer instance for the czech language */
-    struct sb_stemmer *stemmer = nullptr;
-
     /**
      * Load stopwords from the given file
      * @param stopwords_file Filepath to the file with stopwords
      * @return True if stopwords were loaded, false otherwise
      */
     bool load_stopwords();
-    /** Stopwords */
-    std::set<std::string> stopwords;
+
+    /**
+     * Get the precedence of the given boolean operator
+     * @param op Boolean operator
+     * @return Precedence of the operator
+     */
+    int bool_op_precedence(const std::string &op);
 
 public:
     /**

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include "TF_IDF.h"
 #include "Preprocessor.h"
 

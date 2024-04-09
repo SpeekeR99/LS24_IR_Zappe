@@ -64,6 +64,41 @@ void IndexHandler::load_index(Indexer &indexer, const string &index_path) {
     std::cout << "Index loaded in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
 }
 
+void IndexHandler::add_doc_url(Indexer &indexer, const string &url, bool verbose) {
+    if (verbose)
+        std::cout << "Downloading document from " << url << "..." << std::endl;
+
+    /* exec cmd: "../bin/crawler.exe url" */
+    std::filesystem::path crawler_path = "../bin/crawler.exe";
+    std::filesystem::path absolute_crawler_path = std::filesystem::absolute(crawler_path);
+    system(("\"" + absolute_crawler_path.string() + "\" " + url).c_str());
+
+    if (verbose)
+        std::cout << "Document downloaded" << std::endl;
+
+    /* Find the newest file in ../data - it should be the downloaded document */
+    std::string newest_file;
+    chrono::time_point<filesystem::__file_clock> newest_time = chrono::time_point<filesystem::__file_clock>::min();
+    for (const auto &entry : std::filesystem::directory_iterator("../data")) {
+        auto time = std::filesystem::last_write_time(entry.path());
+        if (time > newest_time) {
+            newest_time = time;
+            newest_file = entry.path().string();
+        }
+    }
+
+    if (verbose)
+        std::cout << "Newest file: " << newest_file << std::endl;
+
+    /* Load and preprocess the downloaded document */
+    auto doc = DataLoader::load_json_document(newest_file);
+    auto doc_vec = std::vector<Document>{doc};
+    auto tokenized_doc_vec = preprocess_documents(doc_vec, false);
+
+    /* Add the document to the indexer */
+    add_docs(indexer, doc_vec, verbose);
+}
+
 void IndexHandler::add_docs(Indexer &indexer, std::vector<Document> &docs, bool verbose) {
     if (verbose) {
         std::cout << "Adding new documents..." << std::endl << "IDs: ";

@@ -43,5 +43,8 @@ int main() {
     query = "NOT Geralt AND (z OR NOT NOT Rivie)";
     auto result_bool = IndexHandler::search(indexer, query);
 
+    /* Download https://zaklinac.fandom.com/wiki/Geralt_z_Rivie */
+    IndexHandler::add_doc_url(indexer, "https://zaklinac.fandom.com/wiki/Geralt_z_Rivie");
+
     return EXIT_SUCCESS;
 }

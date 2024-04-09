@@ -40,6 +40,14 @@ public:
     static void load_index(Indexer &indexer, const std::string &index_path);
 
     /**
+     * Add a document to the indexer and cache it from the given URL
+     * @param indexer Indexer
+     * @param url URL to download the document from
+     * @param verbose Whether to print the progress
+     */
+    static void add_doc_url(Indexer &indexer, const std::string &url, bool verbose=true);
+
+    /**
      * Add documents to the indexer and cache
      * @param indexer Indexer
      * @param preprocessor Preprocessor object instance

@@ -7,10 +7,12 @@
 /**
  * Load documents from the given directory
  * @param dir_path Directory path
+ * @param verbose Whether to print the progress
  * @return Documents as a vector and as a map with IDs (cache)
  */
-std::pair<std::vector<Document>, std::unordered_map<int, Document>> load_documents(const std::string &dir_path) {
-    std::cout << "Loading documents..." << std::endl;
+std::pair<std::vector<Document>, std::unordered_map<int, Document>> load_documents(const std::string &dir_path, bool verbose=true) {
+    if (verbose)
+        std::cout << "Loading documents..." << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
     
     auto docs = DataLoader::load_json_documents_from_dir("../data");
@@ -19,8 +21,10 @@ std::pair<std::vector<Document>, std::unordered_map<int, Document>> load_documen
         doc_cache.insert({doc.id, doc});
     
     auto t_end = std::chrono::high_resolution_clock::now();
-    std::cout << "Loaded " << docs.size() << " documents" << std::endl;
-    std::cout << "Loading done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
+    if (verbose) {
+        std::cout << "Loaded " << docs.size() << " documents" << std::endl;
+        std::cout << "Loading done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
+    }
 
     return {docs, doc_cache};
 }
@@ -29,10 +33,12 @@ std::pair<std::vector<Document>, std::unordered_map<int, Document>> load_documen
  * Preprocess documents (Documents -> TokenizedDocuments)
  * @param preprocessor Preprocessor object instance
  * @param docs Documents to preprocess
+ * @param verbose Whether to print the progress
  * @return Tokenized documents (preprocessed)
  */
-std::vector<TokenizedDocument> preprocess_documents(Preprocessor &preprocessor, std::vector<Document> &docs) {
-    std::cout << "Preprocessing documents..." << std::endl;
+std::vector<TokenizedDocument> preprocess_documents(Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose=true) {
+    if (verbose)
+        std::cout << "Preprocessing documents..." << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
     
     auto tokenized_docs = std::vector<TokenizedDocument>();
@@ -48,8 +54,10 @@ std::vector<TokenizedDocument> preprocess_documents(Preprocessor &preprocessor, 
         );
     
     auto t_end = std::chrono::high_resolution_clock::now();
-    std::cout << "Preprocessed " << tokenized_docs.size() << " documents" << std::endl;
-    std::cout << "Preprocessing done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
+    if (verbose) {
+        std::cout << "Preprocessed " << tokenized_docs.size() << " documents" << std::endl;
+        std::cout << "Preprocessing done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
+    }
 
     return tokenized_docs;
 }
@@ -59,12 +67,15 @@ std::vector<TokenizedDocument> preprocess_documents(Preprocessor &preprocessor, 
  * @param indexer_cache_pair Indexer and cache pair
  * @param preprocessor Preprocessor object instance
  * @param docs Documents to add
+ * @param verbose Whether to print the progress
  */
-void add_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::vector<Document> &docs) {
-    std::cout << "Adding new documents..." << std::endl << "IDs: ";
-    for (auto &doc : docs)
-        std::cout << doc.id << ", ";
-    std::cout << std::endl;
+void add_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose=true) {
+    if (verbose) {
+        std::cout << "Adding new documents..." << std::endl << "IDs: ";
+        for (auto &doc : docs)
+            std::cout << doc.id << ", ";
+        std::cout << std::endl;
+    }
 
     auto &indexer = indexer_cache_pair.first;
     auto &doc_cache = indexer_cache_pair.second;
@@ -73,7 +84,7 @@ void add_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pa
     for (auto &doc : docs)
         doc_cache.insert({doc.id, doc});
 
-    auto tokenized_docs = preprocess_documents(preprocessor, docs);
+    auto tokenized_docs = preprocess_documents(preprocessor, docs, false);
 
     indexer.add_docs(tokenized_docs);
 }
@@ -82,13 +93,16 @@ void add_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pa
  * Get documents from the indexer and cache
  * @param indexer_cache_pair Indexer and cache pair
  * @param doc_ids Document IDs
+ * @param verbose Whether to print the progress
  * @return Documents
  */
-std::vector<Document> get_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, std::vector<int> &doc_ids) {
-    std::cout << "Getting documents..."  << std::endl << "IDs: ";
-    for (auto &doc_id : doc_ids)
-        std::cout << doc_id << ", ";
-    std::cout << std::endl;
+std::vector<Document> get_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, std::vector<int> &doc_ids, bool verbose=true) {
+    if (verbose) {
+        std::cout << "Getting documents..."  << std::endl << "IDs: ";
+        for (auto &doc_id : doc_ids)
+            std::cout << doc_id << ", ";
+        std::cout << std::endl;
+    }
 
     std::vector<Document> result;
     result.reserve(doc_ids.size());
@@ -110,12 +124,15 @@ std::vector<Document> get_docs(std::pair<Indexer, unordered_map<int, Document>> 
  * @param preprocessor Preprocessor object instance
  * @param doc_ids Document IDs
  * @param docs Documents to update
+ * @param verbose Whether to print the progress
  */
-void update_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::vector<int> &doc_ids, std::vector<Document> &docs) {
-    std::cout << "Updating documents..."  << std::endl << "IDs: ";
-    for (auto &doc_id : doc_ids)
-        std::cout << doc_id << ", ";
-    std::cout << std::endl;
+void update_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::vector<int> &doc_ids, std::vector<Document> &docs, bool verbose=true) {
+    if (verbose) {
+        std::cout << "Updating documents..."  << std::endl << "IDs: ";
+        for (auto &doc_id : doc_ids)
+            std::cout << doc_id << ", ";
+        std::cout << std::endl;
+    }
 
     auto &indexer = indexer_cache_pair.first;
     auto &doc_cache = indexer_cache_pair.second;
@@ -126,7 +143,7 @@ void update_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache
         doc_cache.insert({doc.id, doc});
     }
 
-    auto tokenized_docs = preprocess_documents(preprocessor, docs);
+    auto tokenized_docs = preprocess_documents(preprocessor, docs, false);
 
     indexer.update_docs(doc_ids, tokenized_docs);
 }
@@ -135,12 +152,15 @@ void update_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache
  * Remove documents from the indexer and cache
  * @param indexer_cache_pair Indexer and cache pair
  * @param doc_ids Document IDs
+ * @param verbose Whether to print the progress
  */
-void remove_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, std::vector<int> &doc_ids) {
-    std::cout << "Removing documents..."  << std::endl << "IDs: ";
-    for (auto &doc_id : doc_ids)
-        std::cout << doc_id << ", ";
-    std::cout << std::endl;
+void remove_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, std::vector<int> &doc_ids, bool verbose=true) {
+    if (verbose) {
+        std::cout << "Removing documents..."  << std::endl << "IDs: ";
+        for (auto &doc_id : doc_ids)
+            std::cout << doc_id << ", ";
+        std::cout << std::endl;
+    }
 
     auto &indexer = indexer_cache_pair.first;
     auto &doc_cache = indexer_cache_pair.second;
@@ -196,7 +216,7 @@ std::pair<std::vector<Document>, std::vector<float>> search(std::pair<Indexer, u
 
     auto result = indexer.search(query_tokens, k);
 
-    auto result_docs = get_docs(indexer_cache_pair, result.first);
+    auto result_docs = get_docs(indexer_cache_pair, result.first, false);
 
     if (print)
         print_query_results(query, {result_docs, result.second});
@@ -215,6 +235,7 @@ std::pair<std::vector<Document>, std::vector<float>> search(std::pair<Indexer, u
 std::vector<Document> search(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::string &query, bool print=true) {
     auto &indexer = indexer_cache_pair.first;
 
+    std::cout << "Query: " << query << std::endl << "Postfix notation: ";
     auto bool_tokens = preprocessor.parse_bool_query(query);
     for (auto &token : bool_tokens)
         std::cout << token << " ";
@@ -222,7 +243,7 @@ std::vector<Document> search(std::pair<Indexer, unordered_map<int, Document>> &i
 
     auto result_ids = indexer.search(bool_tokens);
 
-    auto result_docs = get_docs(indexer_cache_pair, result_ids);
+    auto result_docs = get_docs(indexer_cache_pair, result_ids, false);
 
     if (print)
         print_query_results(query, result_docs);
@@ -251,7 +272,6 @@ int main() {
     auto result = search(indexer_cache_pair, preprocessor, query, 3);
 
     /* Update the document, so it contains "Geralt z Rivie" more and so it is way more relevant (see Score print) */
-    std::cout << "Updating document with ID 550..." << std::endl;
     std::vector<int> new_doc_ids = {550};
     std::vector<Document> new_docs = {{550, {"už ne Geralt z Rivie"}, {}, {}, {}, {}, {"Geralt z Rivie Geralt z Rivie Geralt z Rivie Geralt z Rivie"}}};
     update_docs(indexer_cache_pair, preprocessor, new_doc_ids, new_docs);
@@ -266,7 +286,7 @@ int main() {
     result = search(indexer_cache_pair, preprocessor, query, 3);
 
     /* Search "Geralt z Rivie" boolean */
-    query = "NOT Geralt OR (z AND NOT NOT Rivie)";
+    query = "NOT Geralt AND (z OR NOT NOT Rivie)";
     auto result_bool = search(indexer_cache_pair, preprocessor, query);
 
     return EXIT_SUCCESS;

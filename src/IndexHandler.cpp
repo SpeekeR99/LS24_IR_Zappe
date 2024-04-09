@@ -1,5 +1,7 @@
 #include "IndexHandler.h"
 
+Preprocessor IndexHandler::preprocessor = Preprocessor();
+
 std::vector<Document> IndexHandler::load_documents(const std::string &dir_path, bool verbose) {
     if (verbose)
         std::cout << "Loading documents..." << std::endl;
@@ -16,7 +18,7 @@ std::vector<Document> IndexHandler::load_documents(const std::string &dir_path, 
     return docs;
 }
 
-std::vector<TokenizedDocument> IndexHandler::preprocess_documents(Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose) {
+std::vector<TokenizedDocument> IndexHandler::preprocess_documents(std::vector<Document> &docs, bool verbose) {
     if (verbose)
         std::cout << "Preprocessing documents..." << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
@@ -62,7 +64,7 @@ void IndexHandler::load_index(Indexer &indexer, const string &index_path) {
     std::cout << "Index loaded in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
 }
 
-void IndexHandler::add_docs(Indexer &indexer, Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose) {
+void IndexHandler::add_docs(Indexer &indexer, std::vector<Document> &docs, bool verbose) {
     if (verbose) {
         std::cout << "Adding new documents..." << std::endl << "IDs: ";
         for (auto &doc : docs)
@@ -70,7 +72,7 @@ void IndexHandler::add_docs(Indexer &indexer, Preprocessor &preprocessor, std::v
         std::cout << std::endl;
     }
 
-    auto tokenized_docs = preprocess_documents(preprocessor, docs, false);
+    auto tokenized_docs = preprocess_documents(docs, false);
 
     indexer.add_docs(docs, tokenized_docs);
 }
@@ -88,7 +90,7 @@ std::vector<Document> IndexHandler::get_docs(Indexer &indexer, std::vector<int> 
     return result;
 }
 
-void IndexHandler::update_docs(Indexer &indexer, Preprocessor &preprocessor, std::vector<int> &doc_ids, std::vector<Document> &docs, bool verbose) {
+void IndexHandler::update_docs(Indexer &indexer, std::vector<int> &doc_ids, std::vector<Document> &docs, bool verbose) {
     if (verbose) {
         std::cout << "Updating documents..."  << std::endl << "IDs: ";
         for (auto &doc_id : doc_ids)
@@ -96,7 +98,7 @@ void IndexHandler::update_docs(Indexer &indexer, Preprocessor &preprocessor, std
         std::cout << std::endl;
     }
 
-    auto tokenized_docs = preprocess_documents(preprocessor, docs, false);
+    auto tokenized_docs = preprocess_documents(docs, false);
 
     indexer.update_docs(doc_ids, docs, tokenized_docs);
 }
@@ -127,7 +129,7 @@ void IndexHandler::print_query_results(const std::string &query, std::vector<Doc
     std::cout << std::endl;
 }
 
-std::pair<std::vector<Document>, std::vector<float>> IndexHandler::search(Indexer &indexer, Preprocessor &preprocessor, std::string &query, int k, bool print) {
+std::pair<std::vector<Document>, std::vector<float>> IndexHandler::search(Indexer &indexer, std::string &query, int k, bool print) {
     auto query_tokens = preprocessor.preprocess_text(query, true, false);
 
     auto result = indexer.search(query_tokens, k);
@@ -140,7 +142,7 @@ std::pair<std::vector<Document>, std::vector<float>> IndexHandler::search(Indexe
     return {result_docs, result.second};
 }
 
-std::vector<Document> IndexHandler::search(Indexer &indexer, Preprocessor &preprocessor, std::string &query, bool print) {
+std::vector<Document> IndexHandler::search(Indexer &indexer, std::string &query, bool print) {
     std::cout << "Query: " << query << std::endl << "Postfix notation: ";
     auto bool_tokens = preprocessor.parse_bool_query(query);
     for (auto &token : bool_tokens)

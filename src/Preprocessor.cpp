@@ -226,7 +226,8 @@ std::vector<std::string> Preprocessor::preprocess_text(std::string text, bool le
     text = this->to_lower(text);
 
     /* Remove HTML tags */
-//    text = this->remove_html_tags(text); /* Disabled because of the nature of the data */
+    text = this->remove_html_tags(text); /* DEFAULT: Disabled because of the nature of the data */
+    /* But enabled because of bonus points for semestral work */
 
     /* Tokenize */
     auto tokens = this->tokenize(text);

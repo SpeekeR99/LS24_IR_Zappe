@@ -6,6 +6,8 @@
 
 class IndexHandler {
 public:
+    static Preprocessor preprocessor;
+
     /**
      * Load documents from the given directory
      * @param dir_path Directory path
@@ -21,7 +23,7 @@ public:
      * @param verbose Whether to print the progress
      * @return Tokenized documents (preprocessed)
      */
-    static std::vector<TokenizedDocument> preprocess_documents(Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose=true);
+    static std::vector<TokenizedDocument> preprocess_documents(std::vector<Document> &docs, bool verbose=true);
 
     /**
      * Save the index to the given path
@@ -44,7 +46,7 @@ public:
      * @param docs Documents to add
      * @param verbose Whether to print the progress
      */
-    static void add_docs(Indexer &indexer, Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose=true);
+    static void add_docs(Indexer &indexer, std::vector<Document> &docs, bool verbose=true);
 
     /**
      * Get documents from the indexer and cache
@@ -63,7 +65,7 @@ public:
      * @param docs Documents to update
      * @param verbose Whether to print the progress
      */
-    static void update_docs(Indexer &indexer, Preprocessor &preprocessor, std::vector<int> &doc_ids, std::vector<Document> &docs, bool verbose=true);
+    static void update_docs(Indexer &indexer, std::vector<int> &doc_ids, std::vector<Document> &docs, bool verbose=true);
 
     /**
      * Remove documents from the indexer and cache
@@ -98,7 +100,7 @@ public:
      * @param print Whether to print the results
      * @return Pair of documents and scores
      */
-    static std::pair<std::vector<Document>, std::vector<float>> search(Indexer &indexer, Preprocessor &preprocessor, std::string &query, int k, bool print=true);
+    static std::pair<std::vector<Document>, std::vector<float>> search(Indexer &indexer, std::string &query, int k, bool print=true);
 
     /**
      * Search for the given query (Boolean model)
@@ -108,5 +110,5 @@ public:
      * @param print Whether to print the results
      * @return Documents
      */
-    static std::vector<Document> search(Indexer &indexer, Preprocessor &preprocessor, std::string &query, bool print=true);
+    static std::vector<Document> search(Indexer &indexer, std::string &query, bool print=true);
 };

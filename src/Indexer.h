@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <unordered_map>
 #include "TF_IDF.h"
 #include "Preprocessor.h"
 
@@ -26,50 +27,54 @@ private:
     void index_everything();
 
 public:
+    /** Document cache */
+    std::unordered_map<int, Document> doc_cache;
+
     /**
      * Constructor for the Indexer class
      */
     Indexer();
     /**
      * Constructor for the Indexer class
-     * @param collection Collection of documents
+     * @param original_collection Original collection of documents
+     * @param tokenized_collection Tokenized collection of documents
      */
-    explicit Indexer(const std::vector<TokenizedDocument> &collection);
+    Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection);
 
     /**
      * Add a document to the collection
      * @param doc Document to add
      */
-    void add_doc(const TokenizedDocument &doc);
+    void add_doc(const Document &doc, const TokenizedDocument &tokenized_doc);
     /**
      * Add documents to the collection
      * @param docs Documents to add
      */
-    void add_docs(const std::vector<TokenizedDocument> &docs);
+    void add_docs(const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs);
     /**
      * Get the document with the given ID
      * @param doc_id Document ID
      * @return Document with the given ID
      */
-    TokenizedDocument get_doc(int doc_id);
+    Document get_doc(int doc_id);
     /**
      * Get documents with the given IDs
      * @param doc_ids Vector of document IDs
      * @return Vector of documents with the given IDs
      */
-    std::vector<TokenizedDocument> get_docs(const std::vector<int> &doc_ids);
+    std::vector<Document> get_docs(const std::vector<int> &doc_ids);
     /**
      * Update the document with the given ID
      * @param doc_id Document ID
      * @param doc New document
      */
-    void update_doc(int doc_id, const TokenizedDocument &doc);
+    void update_doc(int doc_id, const Document& doc, const TokenizedDocument &tokenized_doc);
     /**
      * Update documents with the given IDs
      * @param doc_ids Vector of document IDs
      * @param docs Vector of new documents
      */
-    void update_docs(const std::vector<int> &doc_ids, const std::vector<TokenizedDocument> &docs);
+    void update_docs(const std::vector<int> &doc_ids, const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs);
     /**
      * Remove the document with the given ID
      * @param doc_id Document ID

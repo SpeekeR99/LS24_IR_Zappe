@@ -1,11 +1,11 @@
 #include "Indexer.h"
 
-Indexer::Indexer() : collection(std::vector<TokenizedDocument>()), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
+Indexer::Indexer() : collection(std::vector<TokenizedDocument>()), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
     /* Nothing to do here :) */
 }
 
-Indexer::Indexer(const std::vector<TokenizedDocument> &collection) : collection(std::vector<TokenizedDocument>()), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
-    this->add_docs(collection);
+Indexer::Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection) : collection(std::vector<TokenizedDocument>()), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
+    this->add_docs(original_collection, tokenized_collection);
 }
 
 void Indexer::index_everything() {
@@ -24,52 +24,67 @@ void Indexer::index_everything() {
 }
 
 
-void Indexer::add_doc(const TokenizedDocument &doc) {
-    this->collection.emplace_back(doc);
+void Indexer::add_doc(const Document &doc, const TokenizedDocument &tokenized_doc) {
+    this->doc_cache.insert({doc.id, doc});
+    this->collection.emplace_back(tokenized_doc);
     this->index_everything();
 }
 
-void Indexer::add_docs(const std::vector<TokenizedDocument> &docs) {
-    for (const auto &doc : docs)
-        this->collection.emplace_back(doc);
+void Indexer::add_docs(const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs) {
+    for (int i = 0; i < docs.size(); i++) {
+        this->doc_cache.insert({docs[i].id, docs[i]});
+        this->collection.emplace_back(tokenized_docs[i]);
+    }
     this->index_everything();
 }
 
-TokenizedDocument Indexer::get_doc(int doc_id) {
-    for (const auto &doc : this->collection)
-        if (doc.id == doc_id)
-            return doc;
-    return TokenizedDocument(-1, {"NOT FOUND"}, {}, {}, {}, {}, {});
+Document Indexer::get_doc(int doc_id) {
+    try {
+        return this->doc_cache.at(doc_id);
+    } catch (const std::out_of_range &e) {
+        std::cerr << "[ERROR]: Document with ID " << doc_id << " not found!" << std::endl;
+        return {-1, {"NOT FOUND"}, {}, {}, {}, {}, {}};
+    }
 }
 
-std::vector<TokenizedDocument> Indexer::get_docs(const std::vector<int> &doc_ids) {
-    std::vector<TokenizedDocument> result;
+std::vector<Document> Indexer::get_docs(const std::vector<int> &doc_ids) {
+    std::vector<Document> result;
     result.reserve(doc_ids.size());
     for (const auto &doc_id : doc_ids)
-        for (const auto &doc : this->collection)
-            if (doc.id == doc_id)
-                result.emplace_back(doc);
+        result.emplace_back(this->get_doc(doc_id));
     return result;
 }
 
-void Indexer::update_doc(int doc_id, const TokenizedDocument &doc) {
+void Indexer::update_doc(int doc_id, const Document &doc, const TokenizedDocument &tokenized_doc) {
+    this->doc_cache.erase(doc_id);
+    this->doc_cache.insert({doc_id, doc});
+
     for (auto &d : this->collection)
         if (d.id == doc_id)
-            d = doc;
+            d = tokenized_doc;
+
     this->index_everything();
 }
 
-void Indexer::update_docs(const std::vector<int> &doc_ids, const std::vector<TokenizedDocument> &docs) {
-    for (int i = 0; i < doc_ids.size(); i++)
+void Indexer::update_docs(const std::vector<int> &doc_ids, const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs) {
+    for (int i = 0; i < doc_ids.size(); i++) {
+        this->doc_cache.erase(doc_ids[i]);
+        this->doc_cache.insert({doc_ids[i], docs[i]});
+
         for (auto &d : this->collection)
-            if (d.id == doc_ids[i]) {
-                d = docs[i];
-                break;
-            }
+            if (d.id == doc_ids[i])
+                d = tokenized_docs[i];
+    }
     this->index_everything();
 }
 
 void Indexer::remove_doc(int doc_id) {
+    try {
+        this->doc_cache.at(doc_id);
+    } catch (const std::out_of_range &e) {
+        std::cerr << "[ERROR]: Document with ID " << doc_id << " not found!" << std::endl;
+        return;
+    }
     for (auto it = this->collection.begin(); it != this->collection.end(); it++)
         if (it->id == doc_id) {
             this->collection.erase(it);
@@ -79,12 +94,19 @@ void Indexer::remove_doc(int doc_id) {
 }
 
 void Indexer::remove_docs(const std::vector<int> &doc_ids) {
-    for (const auto &doc_id : doc_ids)
+    for (const auto &doc_id : doc_ids) {
+        try {
+            this->doc_cache.at(doc_id);
+        } catch (const std::out_of_range &e) {
+            std::cerr << "[ERROR]: Document with ID " << doc_id << " not found!" << std::endl;
+            continue;
+        }
         for (auto it = this->collection.begin(); it != this->collection.end(); it++)
             if (it->id == doc_id) {
                 this->collection.erase(it);
                 break;
             }
+    }
     this->index_everything();
 }
 

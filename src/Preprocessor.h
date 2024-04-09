@@ -147,7 +147,7 @@ public:
     /**
      * Preprocess the given text
      */
-    std::vector<std::string> preprocess_text(std::string &text, bool lemma=true, bool content=false);
+    std::vector<std::string> preprocess_text(std::string text, bool lemma=true, bool content=false);
     /**
      * Preprocess the given vector of words, phrases or sentences
      */

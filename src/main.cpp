@@ -8,25 +8,22 @@
  * Load documents from the given directory
  * @param dir_path Directory path
  * @param verbose Whether to print the progress
- * @return Documents as a vector and as a map with IDs (cache)
+ * @return Documents as a vector
  */
-std::pair<std::vector<Document>, std::unordered_map<int, Document>> load_documents(const std::string &dir_path, bool verbose=true) {
+std::vector<Document> load_documents(const std::string &dir_path, bool verbose=true) {
     if (verbose)
         std::cout << "Loading documents..." << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
     
     auto docs = DataLoader::load_json_documents_from_dir("../data");
-    std::unordered_map<int, Document> doc_cache;
-    for (auto &doc : docs)
-        doc_cache.insert({doc.id, doc});
-    
+
     auto t_end = std::chrono::high_resolution_clock::now();
     if (verbose) {
         std::cout << "Loaded " << docs.size() << " documents" << std::endl;
         std::cout << "Loading done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
     }
 
-    return {docs, doc_cache};
+    return docs;
 }
 
 /**
@@ -64,12 +61,12 @@ std::vector<TokenizedDocument> preprocess_documents(Preprocessor &preprocessor, 
 
 /**
  * Add documents to the indexer and cache
- * @param indexer_cache_pair Indexer and cache pair
+ * @param indexer Indexer
  * @param preprocessor Preprocessor object instance
  * @param docs Documents to add
  * @param verbose Whether to print the progress
  */
-void add_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose=true) {
+void add_docs(Indexer &indexer, Preprocessor &preprocessor, std::vector<Document> &docs, bool verbose=true) {
     if (verbose) {
         std::cout << "Adding new documents..." << std::endl << "IDs: ";
         for (auto &doc : docs)
@@ -77,26 +74,19 @@ void add_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pa
         std::cout << std::endl;
     }
 
-    auto &indexer = indexer_cache_pair.first;
-    auto &doc_cache = indexer_cache_pair.second;
-
-    /* Update the cache */
-    for (auto &doc : docs)
-        doc_cache.insert({doc.id, doc});
-
     auto tokenized_docs = preprocess_documents(preprocessor, docs, false);
 
-    indexer.add_docs(tokenized_docs);
+    indexer.add_docs(docs, tokenized_docs);
 }
 
 /**
  * Get documents from the indexer and cache
- * @param indexer_cache_pair Indexer and cache pair
+ * @param indexer Indexer
  * @param doc_ids Document IDs
  * @param verbose Whether to print the progress
  * @return Documents
  */
-std::vector<Document> get_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, std::vector<int> &doc_ids, bool verbose=true) {
+std::vector<Document> get_docs(Indexer &indexer, std::vector<int> &doc_ids, bool verbose=true) {
     if (verbose) {
         std::cout << "Getting documents..."  << std::endl << "IDs: ";
         for (auto &doc_id : doc_ids)
@@ -104,16 +94,7 @@ std::vector<Document> get_docs(std::pair<Indexer, unordered_map<int, Document>> 
         std::cout << std::endl;
     }
 
-    std::vector<Document> result;
-    result.reserve(doc_ids.size());
-
-    for (const auto &doc_id : doc_ids) {
-        try {
-            result.emplace_back(indexer_cache_pair.second.at(doc_id));
-        } catch (const std::out_of_range &e) {
-            std::cerr << "[ERROR]: Document with ID " << doc_id << " not found!" << std::endl;
-        }
-    }
+    auto result = indexer.get_docs(doc_ids);
 
     return result;
 }
@@ -126,7 +107,7 @@ std::vector<Document> get_docs(std::pair<Indexer, unordered_map<int, Document>> 
  * @param docs Documents to update
  * @param verbose Whether to print the progress
  */
-void update_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::vector<int> &doc_ids, std::vector<Document> &docs, bool verbose=true) {
+void update_docs(Indexer &indexer, Preprocessor &preprocessor, std::vector<int> &doc_ids, std::vector<Document> &docs, bool verbose=true) {
     if (verbose) {
         std::cout << "Updating documents..."  << std::endl << "IDs: ";
         for (auto &doc_id : doc_ids)
@@ -134,18 +115,9 @@ void update_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache
         std::cout << std::endl;
     }
 
-    auto &indexer = indexer_cache_pair.first;
-    auto &doc_cache = indexer_cache_pair.second;
-
-    /* Update the cache */
-    for (auto &doc : docs) {
-        doc_cache.erase(doc.id);
-        doc_cache.insert({doc.id, doc});
-    }
-
     auto tokenized_docs = preprocess_documents(preprocessor, docs, false);
 
-    indexer.update_docs(doc_ids, tokenized_docs);
+    indexer.update_docs(doc_ids, docs, tokenized_docs);
 }
 
 /**
@@ -154,20 +126,13 @@ void update_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache
  * @param doc_ids Document IDs
  * @param verbose Whether to print the progress
  */
-void remove_docs(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, std::vector<int> &doc_ids, bool verbose=true) {
+void remove_docs(Indexer &indexer, std::vector<int> &doc_ids, bool verbose=true) {
     if (verbose) {
         std::cout << "Removing documents..."  << std::endl << "IDs: ";
         for (auto &doc_id : doc_ids)
             std::cout << doc_id << ", ";
         std::cout << std::endl;
     }
-
-    auto &indexer = indexer_cache_pair.first;
-    auto &doc_cache = indexer_cache_pair.second;
-
-    /* Update the cache */
-    for (auto &doc_id : doc_ids)
-        doc_cache.erase(doc_id);
 
     indexer.remove_docs(doc_ids);
 }
@@ -208,15 +173,12 @@ void print_query_results(const std::string &query, std::vector<Document> &result
  * @param print Whether to print the results
  * @return Pair of documents and scores
  */
-std::pair<std::vector<Document>, std::vector<float>> search(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::string &query, int k, bool print=true) {
-    auto &indexer = indexer_cache_pair.first;
-    auto &doc_cache = indexer_cache_pair.second;
-
+std::pair<std::vector<Document>, std::vector<float>> search(Indexer &indexer, Preprocessor &preprocessor, std::string &query, int k, bool print=true) {
     auto query_tokens = preprocessor.preprocess_text(query, true, false);
 
     auto result = indexer.search(query_tokens, k);
 
-    auto result_docs = get_docs(indexer_cache_pair, result.first, false);
+    auto result_docs = get_docs(indexer, result.first, false);
 
     if (print)
         print_query_results(query, {result_docs, result.second});
@@ -232,9 +194,7 @@ std::pair<std::vector<Document>, std::vector<float>> search(std::pair<Indexer, u
  * @param print Whether to print the results
  * @return Documents
  */
-std::vector<Document> search(std::pair<Indexer, unordered_map<int, Document>> &indexer_cache_pair, Preprocessor &preprocessor, std::string &query, bool print=true) {
-    auto &indexer = indexer_cache_pair.first;
-
+std::vector<Document> search(Indexer &indexer, Preprocessor &preprocessor, std::string &query, bool print=true) {
     std::cout << "Query: " << query << std::endl << "Postfix notation: ";
     auto bool_tokens = preprocessor.parse_bool_query(query);
     for (auto &token : bool_tokens)
@@ -243,7 +203,7 @@ std::vector<Document> search(std::pair<Indexer, unordered_map<int, Document>> &i
 
     auto result_ids = indexer.search(bool_tokens);
 
-    auto result_docs = get_docs(indexer_cache_pair, result_ids, false);
+    auto result_docs = get_docs(indexer, result_ids, false);
 
     if (print)
         print_query_results(query, result_docs);
@@ -257,37 +217,36 @@ std::vector<Document> search(std::pair<Indexer, unordered_map<int, Document>> &i
  */
 int main() {
     /* Load documents */
-    auto [docs, doc_cache] = load_documents("../data");
+    auto docs = load_documents("../data");
 
     /* Preprocess documents */
     auto preprocessor = Preprocessor();
     auto tokenized_docs = preprocess_documents(preprocessor, docs);
 
     /* Index documents */
-    auto indexer = Indexer(tokenized_docs);
-    std::pair<Indexer, std::unordered_map<int, Document>> indexer_cache_pair = {indexer, doc_cache};
+    auto indexer = Indexer(docs, tokenized_docs);
 
     /* Search "Geralt z Rivie" */
     std::string query = "Geralt z Rivie";
-    auto result = search(indexer_cache_pair, preprocessor, query, 3);
+    auto result = search(indexer, preprocessor, query, 3);
 
     /* Update the document, so it contains "Geralt z Rivie" more and so it is way more relevant (see Score print) */
     std::vector<int> new_doc_ids = {550};
     std::vector<Document> new_docs = {{550, {"už ne Geralt z Rivie"}, {}, {}, {}, {}, {"Geralt z Rivie Geralt z Rivie Geralt z Rivie Geralt z Rivie"}}};
-    update_docs(indexer_cache_pair, preprocessor, new_doc_ids, new_docs);
+    update_docs(indexer, preprocessor, new_doc_ids, new_docs);
 
     /* Search "Geralt z Rivie" again */
-    result = search(indexer_cache_pair, preprocessor, query, 3);
+    result = search(indexer, preprocessor, query, 3);
 
     /* Remove the document completely now and see how the score of others changes too, because overall IDF changes */
-    remove_docs(indexer_cache_pair, new_doc_ids);
+    remove_docs(indexer, new_doc_ids);
 
     /* Search "Geralt z Rivie" again and see how the score of others changes (also ID 550 is gone, shocking!) */
-    result = search(indexer_cache_pair, preprocessor, query, 3);
+    result = search(indexer, preprocessor, query, 3);
 
     /* Search "Geralt z Rivie" boolean */
     query = "NOT Geralt AND (z OR NOT NOT Rivie)";
-    auto result_bool = search(indexer_cache_pair, preprocessor, query);
+    auto result_bool = search(indexer, preprocessor, query);
 
     return EXIT_SUCCESS;
 }

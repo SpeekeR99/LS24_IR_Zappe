@@ -221,7 +221,7 @@ std::vector<std::string> &Preprocessor::remove_duplicates(std::vector<std::strin
     return words;
 }
 
-std::vector<std::string> Preprocessor::preprocess_text(std::string &text, bool lemma, bool content) {
+std::vector<std::string> Preprocessor::preprocess_text(std::string text, bool lemma, bool content) {
     /* Lower case */
     text = this->to_lower(text);
 

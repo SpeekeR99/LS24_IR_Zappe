@@ -185,51 +185,7 @@ std::vector<Document> IndexHandler::search(Indexer &indexer, std::string &query,
     return result_docs;
 }
 
-
-std::vector<std::string> IndexHandler::detect_lang(const std::vector<Document> &docs, bool verbose) {
-    if (verbose)
-        std::cout << "Detecting language of " << docs.size() << " documents..." << std::endl;
-
-    /* mkdir tmp_detect */
-    std::filesystem::create_directory("tmp_detect");
-
-    /* Concatenate the title and content */
-    for (auto &doc : docs) {
-        std::ofstream file("tmp_detect/" + std::to_string(doc.id) + ".txt");
-        file << doc.title << " " << doc.content;
-        file.close();
-    }
-
-    /* Detect the language */
-    auto result = PyHandler::run_lang_detector("tmp_detect/");
-
-    /* Remove the tmp_detect directory */
-    std::filesystem::remove_all("tmp_detect");
-
-    /* Find the language in result based on print(f"Predicted language: {labels}") */
-    std::string start_str = "Predicted languages: ";
-    auto start = result.find(start_str);
-    auto lang = result.substr(start + start_str.size());
-
-    if (verbose)
-        std::cout << "Detected languages: " << lang << std::endl;
-
-    /* lang = ['cs', 'cs', 'cs', 'cs', 'cs'] */
-    auto langs = std::vector<std::string>();
-    auto start_idx = 0;
-    while (true) {
-        auto start = lang.find("'", start_idx);
-        if (start == std::string::npos)
-            break;
-        auto end = lang.find("'", start + 1);
-        langs.push_back(lang.substr(start + 1, end - start - 1));
-        start_idx = end + 1;
-    }
-
-    return langs;
-}
-
-std::vector<std::string> IndexHandler::detect_lang(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose) {
+std::unordered_map<int, std::string> IndexHandler::detect_lang(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose) {
     if (verbose) {
         std::cout << "Detecting language of documents with IDs: ";
         for (auto &doc_id : doc_ids)
@@ -240,5 +196,5 @@ std::vector<std::string> IndexHandler::detect_lang(Indexer &indexer, const std::
     /* Get the documents */
     auto docs = get_docs(indexer, doc_ids, false);
 
-    return detect_lang(docs, verbose);
+    return PyHandler::detect_lang(docs, verbose);
 }

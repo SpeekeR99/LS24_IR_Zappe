@@ -14,9 +14,6 @@ int main() {
     /* Index documents */
     auto indexer = Indexer(docs, tokenized_docs);
 
-    /* Detect languages */
-    auto langs = IndexHandler::detect_lang(docs);
-
     /* Save the index */
     IndexHandler::save_index(indexer, "../index/index1.json");
 

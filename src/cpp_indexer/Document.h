@@ -55,7 +55,7 @@ public:
             const std::vector<std::string> &h1,
             const std::vector<std::string> &h2,
             const std::vector<std::string> &h3,
-            std::string content,
+            std::string content
     ) :
             id(id), title(std::move(title)), toc(toc), h1(h1), h2(h2), h3(h3), content(std::move(content)), lang() {
         /* Nothing to do here :) */
@@ -73,7 +73,8 @@ public:
             {"h1", h1},
             {"h2", h2},
             {"h3", h3},
-            {"content", content}
+            {"content", content},
+            {"lang", lang}
         };
     }
     /**
@@ -88,6 +89,7 @@ public:
         h2 = data["h2"].get<std::vector<std::string>>();
         h3 = data["h3"].get<std::vector<std::string>>();
         content = data["content"];
+        lang = data["lang"];
     }
 };
 
@@ -156,7 +158,8 @@ public:
             {"h1", h1},
             {"h2", h2},
             {"h3", h3},
-            {"content", content}
+            {"content", content},
+            {"lang", lang}
         };
     }
     /**
@@ -171,5 +174,6 @@ public:
         h2 = data["h2"].get<std::vector<std::string>>();
         h3 = data["h3"].get<std::vector<std::string>>();
         content = data["content"];
+        lang = data["lang"];
     }
 };

@@ -42,10 +42,13 @@ def main(model_path, document_path):
 
     # Load document
     document = []
+    ids = []
     for file in os.listdir(document_path):
         filepath = os.path.join(document_path, file)
         with open(filepath, "r", encoding="utf-8") as fp:
             document.append(fp.read())
+            file_without_ext = os.path.splitext(file)[0]
+            ids.append(file_without_ext)
 
     # Predict language
     y_pred = model.predict(document)
@@ -56,7 +59,8 @@ def main(model_path, document_path):
     # Convert label to language
     labels = [label2lang[label] for label in y_pred]
 
-    print(f"Predicted languages: {labels}")
+    result = dict(zip(ids, labels))
+    print(f"Predicted languages: {result}")
 
 
 if __name__ == "__main__":

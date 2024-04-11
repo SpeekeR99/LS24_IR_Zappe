@@ -9,9 +9,21 @@ Indexer::Indexer(const std::vector<Document> &original_collection, const std::ve
 }
 
 void Indexer::index_everything() {
+    /* Detect languages */
+    if (DETECT_LANG) {
+        std::vector<Document> docs;
+        for (const auto &[_, doc]: this->doc_cache)
+            docs.emplace_back(doc);
+        auto langs = PyHandler::detect_lang(docs);
+        for (auto i = 0; i < docs.size(); i++) {
+            auto id = docs[i].id;
+            this->doc_cache[id].lang = langs[i];
+            this->collection[i].lang = langs[i];
+        }
+    }
+
     std::cout << "Indexing documents..." << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
-
     this->norms.clear();
     this->title_norms.clear();
     this->index = TF_IDF::calc_tf_idf(this->collection, this->norms);

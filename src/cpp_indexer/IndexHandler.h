@@ -123,18 +123,10 @@ public:
 
     /**
      * Detect the language of the document
-     * @param docs Documents
-     * @param verbose Whether to print the progress
-     * @return Detected languages
-     */
-    static std::vector<std::string> detect_lang(const std::vector<Document> &docs, bool verbose=true);
-
-    /**
-     * Detect the language of the document
      * @param indexer Indexer
      * @param doc_ids Document IDs
      * @param verbose Whether to print the progress
-     * @return Detected languages
+     * @return Dictionary of IDs and detected languages
      */
-    static std::vector<std::string> detect_lang(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose=true);
+    static std::unordered_map<int, std::string> detect_lang(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose=true);
 };

@@ -5,8 +5,11 @@
 #include "nlohmann/json.hpp"
 #include "TF_IDF.h"
 #include "Preprocessor.h"
+#include "PyHandler.h"
 
 using json = nlohmann::json;
+
+constexpr bool DETECT_LANG = true;
 
 /**
  * Class for indexing the documents

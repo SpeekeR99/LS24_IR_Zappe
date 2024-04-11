@@ -7,6 +7,9 @@
 #include <string>
 #include <array>
 #include <fstream>
+#include <unordered_map>
+#include <vector>
+#include "Document.h"
 
 /**
  * Python script handler class
@@ -47,4 +50,12 @@ public:
      * @return Detected language
      */
     static std::string run_lang_detector(const std::string& dir);
+
+    /**
+     * Detect the language of the document
+     * @param docs Documents
+     * @param verbose Whether to print the progress
+     * @return Dictionary of IDs and detected languages
+     */
+    static std::unordered_map<int, std::string> detect_lang(const std::vector<Document> &docs, bool verbose=true);
 };

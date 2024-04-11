@@ -24,6 +24,7 @@ int main() {
     /* Search "Geralt z Rivie" */
     std::string query = "Geralt z Rivie";
     auto result = IndexHandler::search(indexer, query, 3);
+    result = IndexHandler::search(indexer, query, 3, FieldType::TITLE);
 
     /* Update the document, so it contains "Geralt z Rivie" more and so it is way more relevant (see Score print) */
     std::vector<int> new_doc_ids = {550};
@@ -42,6 +43,7 @@ int main() {
     /* Search "Geralt z Rivie" boolean */
     query = "NOT Geralt AND (z OR NOT NOT Rivie)";
     auto result_bool = IndexHandler::search(indexer, query);
+    result_bool = IndexHandler::search(indexer, query, FieldType::TITLE);
 
     /* Download https://zaklinac.fandom.com/wiki/Geralt_z_Rivie */
     IndexHandler::add_doc_url(indexer, "https://zaklinac.fandom.com/wiki/Geralt_z_Rivie");

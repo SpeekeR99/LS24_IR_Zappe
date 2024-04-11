@@ -106,20 +106,22 @@ public:
      * @param preprocessor Preprocessor object instance
      * @param query Query
      * @param k Number of results
+     * @param field Field to search in
      * @param print Whether to print the results
      * @return Pair of documents and scores
      */
-    static std::pair<std::vector<Document>, std::vector<float>> search(Indexer &indexer, std::string &query, int k, bool print=true);
+    static std::pair<std::vector<Document>, std::vector<float>> search(Indexer &indexer, std::string &query, int k, FieldType field=FieldType::ALL, bool print=true);
 
     /**
      * Search for the given query (Boolean model)
      * @param indexer_cache_pair Indexer and cache pair
      * @param preprocessor Preprocessor object instance
      * @param query Query
+     * @param field Field to search in
      * @param print Whether to print the results
      * @return Documents
      */
-    static std::vector<Document> search(Indexer &indexer, std::string &query, bool print=true);
+    static std::vector<Document> search(Indexer &indexer, std::string &query, FieldType field=FieldType::ALL, bool print=true);
 
     /**
      * Detect the language of the document

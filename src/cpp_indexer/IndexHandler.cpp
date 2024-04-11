@@ -155,10 +155,10 @@ void IndexHandler::print_query_results(const std::string &query, std::vector<Doc
     std::cout << std::endl;
 }
 
-std::pair<std::vector<Document>, std::vector<float>> IndexHandler::search(Indexer &indexer, std::string &query, int k, bool print) {
+std::pair<std::vector<Document>, std::vector<float>> IndexHandler::search(Indexer &indexer, std::string &query, int k, FieldType field, bool print) {
     auto query_tokens = preprocessor.preprocess_text(query, true, false);
 
-    auto result = indexer.search(query_tokens, k);
+    auto result = indexer.search(query_tokens, k, field);
 
     auto result_docs = get_docs(indexer, result.first, false);
 
@@ -168,14 +168,14 @@ std::pair<std::vector<Document>, std::vector<float>> IndexHandler::search(Indexe
     return {result_docs, result.second};
 }
 
-std::vector<Document> IndexHandler::search(Indexer &indexer, std::string &query, bool print) {
+std::vector<Document> IndexHandler::search(Indexer &indexer, std::string &query, FieldType field, bool print) {
     std::cout << "Query: " << query << std::endl << "Postfix notation: ";
     auto bool_tokens = preprocessor.parse_bool_query(query);
     for (auto &token : bool_tokens)
         std::cout << token << " ";
     std::cout << std::endl;
 
-    auto result_ids = indexer.search(bool_tokens);
+    auto result_ids = indexer.search(bool_tokens, field);
 
     auto result_docs = get_docs(indexer, result_ids, false);
 

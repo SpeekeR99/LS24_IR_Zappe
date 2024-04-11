@@ -9,7 +9,17 @@
 
 using json = nlohmann::json;
 
-constexpr bool DETECT_LANG = true;
+/** Language detection is really slow */
+constexpr bool DETECT_LANG = false;
+
+/**
+ * Enum for the field type
+ */
+enum class FieldType {
+    TITLE,
+    CONTENT,
+    ALL
+};
 
 /**
  * Class for indexing the documents
@@ -102,17 +112,19 @@ public:
     [[nodiscard]] float cosine_similarity(const std::map<std::string, float> &query, int doc_id, bool title = false) const;
     /**
      * Search for the given query (VECTOR MODEL)
-     * @param query Query
+     * @param query Query tokens
      * @param k Top k results
+     * @param field Field to search in
      * @return IDs of the top k documents and their scores
      */
-    [[nodiscard]] std::pair<std::vector<int>, std::vector<float>> search(const std::vector<std::string> &query, int k) const;
+    [[nodiscard]] std::pair<std::vector<int>, std::vector<float>> search(const std::vector<std::string> &query, int k, FieldType field = FieldType::ALL) const;
     /**
      * Search for the given query (BOOLEAN MODEL)
-     * @param query_tokens Query tokens
+     * @param query_tokens Query tokens (EXPECTED postfix notation)
+     * @param field Field to search in
      * @return IDs of the documents that fulfill the query conditions
      */
-    [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query_tokens) const;
+    [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query_tokens, FieldType field = FieldType::ALL) const;
 
     /**
      * Indexer to json

@@ -25,7 +25,7 @@ void GUI::init() {
 
     /* Create a windowed mode window and its OpenGL context */
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); /* Disable resizing */
-    this->window = glfwCreateWindow(window_width, window_height, "NSES Zappe", nullptr, nullptr);
+    this->window = glfwCreateWindow(window_width, window_height, "Zaklínačský Vyhledávač na IR - Zappe", nullptr, nullptr);
     if (!this->window) {
         glfwTerminate();
         throw std::runtime_error("GLFW window creation error");
@@ -83,31 +83,31 @@ void GUI::render() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
         /* Set up the main GUI configuration window */
-        ImGui::Begin("Configuration", nullptr,
+        ImGui::Begin("Hlavni okno", nullptr,
                      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
                      ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar);
 
         /* Set up the main GUI window position, size and font size */
         ImGui::SetWindowPos(ImVec2(0, 0));
-        ImGui::SetWindowSize(ImVec2((float) window_width / 2.0f, (float) window_height));
+        ImGui::SetWindowSize(ImVec2((float) window_width, (float) window_height));
         ImGui::SetWindowFontScale(font_size);
 
         /* Set up the main GUI menu bar */
         if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("File")) { /* File menu */
+            if (ImGui::BeginMenu("Soubor")) { /* File menu */
                 if (ImGui::MenuItem("Exit", "Alt+F4"))
                     glfwSetWindowShouldClose(window, true);
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Settings")) { /* Settings menu */
-                if (ImGui::MenuItem("Graphics Settings")) {
+            if (ImGui::BeginMenu("Nastaveni")) { /* Settings menu */
+                if (ImGui::MenuItem("Graficka nastaveni...")) {
                     show_settings_window = true;
                 }
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Help")) { /* Help menu */
-                if (ImGui::MenuItem("About")) {
+            if (ImGui::BeginMenu("Pomoc")) { /* Help menu */
+                if (ImGui::MenuItem("O aplikaci...")) {
                     show_about_window = true;
                 }
                 ImGui::EndMenu();
@@ -115,38 +115,14 @@ void GUI::render() {
             ImGui::EndMenuBar();
         }
 
-        /* Data section */
-        ImGui::SeparatorText("Data");
-
-        /* Neural Network settings section */
-        ImGui::SeparatorText("Neural Network settings");
-
-        /* Training section */
-        ImGui::SeparatorText("Training");
-
-        ImGui::Separator();
-
-        ImGui::End();
-
-        /* Right side of the GUI, data visualization, loss function */
-        ImGui::Begin("Data visuals", nullptr,
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
-                     ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
-                     ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar);
-
-        /* Set up the main GUI window position, size and font size */
-        ImGui::SetWindowPos(ImVec2((float) window_width / 2.0f, 0));
-        ImGui::SetWindowSize(ImVec2((float) window_width / 2.0f, (float) window_height));
-        ImGui::SetWindowFontScale(font_size);
-
         /* TabBar */
         if (ImGui::BeginTabBar("##TabBar")) {
             /* Data tab */
-            if (ImGui::BeginTabItem("Data")) {
+            if (ImGui::BeginTabItem("Vyhledavac")) {
                 ImGui::EndTabItem();
             }
             /* Loss function tab */
-            if (ImGui::BeginTabItem("Loss function")) {
+            if (ImGui::BeginTabItem("Indexovani")) {
                 ImGui::EndTabItem();
             }
 
@@ -163,24 +139,24 @@ void GUI::render() {
     {
         if (show_settings_window) {
             /* Create a window */
-            ImGui::Begin("Graphics Settings", &show_settings_window,
+            ImGui::Begin("Graficka nastaveni", &show_settings_window,
                          ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
             /* Set the window size */
             ImGui::SetWindowSize(ImVec2(600, 400));
 
             /* Window settings section */
-            ImGui::SeparatorText("Window Settings");
+            ImGui::SeparatorText("Nastaveni okna");
 
             /* Set the size of the window and the position of the window */
-            if (ImGui::Button("Set 1280x720")) {
+            if (ImGui::Button("Nastav na 1280x720")) {
                 window_width = 1280;
                 window_height = 720;
                 glfwSetWindowSize(window, window_width, window_height);
                 glfwSetWindowPos(window, (mode->width - window_width) / 2, (mode->height - window_height) / 2);
             }
             ImGui::SameLine();
-            if (ImGui::Button("Set 1600x900")) {
+            if (ImGui::Button("Nastav na 1600x900")) {
                 window_width = 1600;
                 window_height = 900;
                 glfwSetWindowSize(window, window_width, window_height);
@@ -188,13 +164,13 @@ void GUI::render() {
             }
             ImGui::SameLine();
             if (!fullscreen) {
-                if (ImGui::Button("Fullscreen")) {
+                if (ImGui::Button("Rezim fullscreen")) {
                     window_width = mode->width;
                     window_height = mode->height;
                     fullscreen = true; // Set fullscreen to true
                 }
             } else {
-                if (ImGui::Button("Windowed")) {
+                if (ImGui::Button("Rezim okna")) {
                     window_width = 1280;
                     window_height = 720;
                     glfwSetWindowMonitor(window, nullptr, 0, 0, window_width, window_height, 0);
@@ -204,7 +180,7 @@ void GUI::render() {
             }
 
             /* Set the font size */
-            if (ImGui::InputFloat("Font Size", &font_size, 0.1f, 0.3f, "%.1f")) {
+            if (ImGui::InputFloat("Velikost fontu", &font_size, 0.1f, 0.3f, "%.1f")) {
                 // On change, clamp the value between 1.0 and 2.0
                 if (font_size < 1.0f) font_size = 1.0f;
                 if (font_size > 2.0f) font_size = 2.0f;
@@ -212,9 +188,9 @@ void GUI::render() {
             ImGui::SetWindowFontScale(font_size);
 
             /* Colors section */
-            ImGui::SeparatorText("Colors");
+            ImGui::SeparatorText("Barvy");
             static int style_idx = 0; // Overall style
-            if (ImGui::Combo("Style", &style_idx, "Dark\0Light\0Classic\0")) {
+            if (ImGui::Combo("Styl", &style_idx, "Tmavy\0Svetly\0Klasika\0")) {
                 switch (style_idx) {
                     case 0:
                         ImGui::StyleColorsDark();
@@ -238,13 +214,13 @@ void GUI::render() {
         if (show_about_window) {
             ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always,
                                     ImVec2(0.5f, 0.5f)); // Center the window
-            ImGui::Begin("About", &show_about_window,
+            ImGui::Begin("O aplikaci", &show_about_window,
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
                          ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse);
             ImGui::SetWindowFontScale(font_size); // Set the font size
-            ImGui::Text("This application was made by:\nDominik Zappe");
+            ImGui::Text("Aplikace byla vytvorena autorem:\nDominik Zappe");
             ImGui::Separator();
-            ImGui::Text("Application serves as Semestral Project for IR course");
+            ImGui::Text("Aplikace slouzi jako semestralni prace na predmet IR");
             ImGui::End();
         }
     }

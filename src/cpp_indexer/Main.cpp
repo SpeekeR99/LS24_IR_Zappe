@@ -1,10 +1,14 @@
 #include "IndexHandler.h"
+#include "GUI.h"
 
 /**
  * Main function
  * @return Exit code
  */
 int main() {
+    GUI gui = GUI();
+    gui.run();
+
     /* Load documents */
     auto docs = IndexHandler::load_documents("../data");
 

@@ -6,6 +6,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ --stati
 
 include_directories(src)
 include_directories(src/cpp_indexer)
+include_directories(src/cpp_indexer/data)
+include_directories(src/cpp_indexer/index)
+include_directories(src/cpp_indexer/gui)
 
 # - - - - - IR - - - - -
 
@@ -95,19 +98,21 @@ set(
 add_executable(
     cpp_tf_idf
     src/cpp_indexer/Main.cpp
-    src/cpp_indexer/IndexHandler.h
-    src/cpp_indexer/IndexHandler.cpp
-    src/cpp_indexer/Document.h
-    src/cpp_indexer/DataLoader.h
-    src/cpp_indexer/DataLoader.cpp
-    src/cpp_indexer/Preprocessor.h
-    src/cpp_indexer/Preprocessor.cpp
-    src/cpp_indexer/TF_IDF.h
-    src/cpp_indexer/TF_IDF.cpp
-    src/cpp_indexer/Indexer.h
-    src/cpp_indexer/Indexer.cpp
+    src/cpp_indexer/index/IndexHandler.h
+    src/cpp_indexer/index/IndexHandler.cpp
+    src/cpp_indexer/data/Document.h
+    src/cpp_indexer/data/DataLoader.h
+    src/cpp_indexer/data/DataLoader.cpp
+    src/cpp_indexer/data/Preprocessor.h
+    src/cpp_indexer/data/Preprocessor.cpp
+    src/cpp_indexer/index/TF_IDF.h
+    src/cpp_indexer/index/TF_IDF.cpp
+    src/cpp_indexer/index/Indexer.h
+    src/cpp_indexer/index/Indexer.cpp
     src/PyHandler.h
     src/PyHandler.cpp
+    src/cpp_indexer/gui/GUI.h
+    src/cpp_indexer/gui/GUI.cpp
     ${lemma_lib_src}
     ${stem_lib_src}
     ${imgui_files}

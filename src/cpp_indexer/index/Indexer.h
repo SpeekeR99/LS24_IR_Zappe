@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <unordered_map>
+#include <unordered_set>
 #include "nlohmann/json.hpp"
 #include "TF_IDF.h"
 #include "Preprocessor.h"
@@ -28,6 +29,8 @@ class Indexer {
 private:
     /** Collection of documents */
     std::vector<TokenizedDocument> collection;
+    /** Keywords */
+    std::unordered_set<std::string> keywords;
     /** Main index */
     std::map<std::string, map_element> index;
     /** Title index */
@@ -36,6 +39,11 @@ private:
     std::map<int, float> norms;
     /** Title norms (cosine similarity) */
     std::map<int, float> title_norms;
+
+    /**
+     * Adds words from the collection to the keywords
+     */
+    void docs_to_keywords();
 
     /**
      * Index the given collection of documents

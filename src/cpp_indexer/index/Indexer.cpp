@@ -1,11 +1,31 @@
 #include "Indexer.h"
 
-Indexer::Indexer() : collection(std::vector<TokenizedDocument>()), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
+Indexer::Indexer() : collection(std::vector<TokenizedDocument>()), keywords(), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
     /* Nothing to do here :) */
 }
 
-Indexer::Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection) : collection(std::vector<TokenizedDocument>()), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
+Indexer::Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection) : collection(std::vector<TokenizedDocument>()), keywords(), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
     this->add_docs(original_collection, tokenized_collection);
+}
+
+void Indexer::docs_to_keywords() {
+    /* Clear the keywords */
+    this->keywords.clear();
+    /* Add words from the collection to the keywords */
+    for (const auto &doc : this->collection) {
+        for (const auto &word : doc.title)
+            this->keywords.insert(word);
+        for (const auto &word : doc.toc)
+            this->keywords.insert(word);
+        for (const auto &word : doc.h1)
+            this->keywords.insert(word);
+        for (const auto &word : doc.h2)
+            this->keywords.insert(word);
+        for (const auto &word : doc.h3)
+            this->keywords.insert(word);
+        for (const auto &word : doc.content)
+            this->keywords.insert(word);
+    }
 }
 
 void Indexer::index_everything() {
@@ -24,6 +44,7 @@ void Indexer::index_everything() {
 
     std::cout << "Indexing documents..." << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
+    this->docs_to_keywords();
     this->norms.clear();
     this->title_norms.clear();
     this->index = TF_IDF::calc_tf_idf(this->collection, this->norms);

@@ -36,7 +36,7 @@ Nadstandardní funkčnost (lze získat až dalších 15 bodů), např.:
    a rovnou je zaindexuje do existujícího indexu (2b)
  - další předzpracování normalizace                                                                               (DONE) (1b)
  - GUI/webové rozhraní                                                                                        (NOT DONE)
- - napovídání keywords                                                                                        (NOT DONE)
+ - napovídání keywords                                                                                       (SEMI DONE)
  - podpora více polí pro dokument (např. datum, od do)                                                            (DONE) (1b)
  - zvýraznění hledaného textu v náhledu výsledků                                                              (NOT DONE)
  - vlastní implementace parsování dotazů bez použití externí knihovny                                             (DONE) (1b)

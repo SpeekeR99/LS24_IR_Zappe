@@ -9,7 +9,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <vector>
-#include "Document.h"
+#include "cpp_indexer/data/Document.h"
 
 /**
  * Python script handler class

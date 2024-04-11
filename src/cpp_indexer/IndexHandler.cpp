@@ -68,30 +68,21 @@ void IndexHandler::add_doc_url(Indexer &indexer, const string &url, bool verbose
     if (verbose)
         std::cout << "Downloading document from " << url << "..." << std::endl;
 
-    /* exec cmd: "../bin/crawler.exe url" */
-    std::filesystem::path crawler_path = "../bin/crawler.exe";
-    std::filesystem::path absolute_crawler_path = std::filesystem::absolute(crawler_path);
-    system(("\"" + absolute_crawler_path.string() + "\" " + url).c_str());
+    /* Run the crawler to download the document */
+    auto result = PyHandler::run_crawler(url);
+
+    /* Find the file in result based on print("Successfully wrote to file: ../download/" + title + ".json") */
+    std::string start_str = "Successfully wrote to file: ";
+    std::string end_str = ".json";
+    auto start = result.find(start_str);
+    auto end = result.find(end_str);
+    auto file = result.substr(start + start_str.size(), end - start - start_str.size() + end_str.size());
 
     if (verbose)
-        std::cout << "Document downloaded" << std::endl;
-
-    /* Find the newest file in ../data - it should be the downloaded document */
-    std::string newest_file;
-    chrono::time_point<filesystem::__file_clock> newest_time = chrono::time_point<filesystem::__file_clock>::min();
-    for (const auto &entry : std::filesystem::directory_iterator("../data")) {
-        auto time = std::filesystem::last_write_time(entry.path());
-        if (time > newest_time) {
-            newest_time = time;
-            newest_file = entry.path().string();
-        }
-    }
-
-    if (verbose)
-        std::cout << "Newest file: " << newest_file << std::endl;
+        std::cout << "Document downloaded and saved to: " << file << std::endl;
 
     /* Load and preprocess the downloaded document */
-    auto doc = DataLoader::load_json_document(newest_file);
+    auto doc = DataLoader::load_json_document(file);
     auto doc_vec = std::vector<Document>{doc};
     auto tokenized_doc_vec = preprocess_documents(doc_vec, false);
 
@@ -192,4 +183,29 @@ std::vector<Document> IndexHandler::search(Indexer &indexer, std::string &query,
         print_query_results(query, result_docs);
 
     return result_docs;
+}
+
+std::string IndexHandler::detect_lang(Indexer &indexer, int doc_id, bool verbose) {
+    if (verbose)
+        std::cout << "Detecting language of document with ID " << doc_id << "..." << std::endl;
+
+    /* Get the document */
+    auto id_vec = std::vector<int>{doc_id};
+    auto doc = get_docs(indexer, id_vec, false)[0];
+
+    /* Concatenate the title and content */
+    std::string text = doc.title + " " + doc.content;
+
+    /* Detect the language */
+    auto result = PyHandler::run_lang_detector(text);
+
+    /* Find the language in result based on print(f"Predicted language: {label}") */
+    std::string start_str = "Predicted language: ";
+    auto start = result.find(start_str);
+    auto lang = result.substr(start + start_str.size());
+
+    if (verbose)
+        std::cout << "Detected language: " << lang << std::endl;
+
+    return lang;
 }

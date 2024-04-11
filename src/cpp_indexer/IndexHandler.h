@@ -3,6 +3,7 @@
 #include "DataLoader.h"
 #include "Preprocessor.h"
 #include "Indexer.h"
+#include "PyHandler.h"
 
 class IndexHandler {
 public:
@@ -119,4 +120,13 @@ public:
      * @return Documents
      */
     static std::vector<Document> search(Indexer &indexer, std::string &query, bool print=true);
+
+    /**
+     * Detect the language of the document
+     * @param indexer Indexer
+     * @param doc_id Document ID
+     * @param verbose Whether to print the progress
+     * @return Detected language
+     */
+    static std::string detect_lang(Indexer &indexer, int doc_id, bool verbose=true);
 };

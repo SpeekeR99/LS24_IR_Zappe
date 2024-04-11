@@ -80,8 +80,9 @@ def download_webpage_as_json(crawler, url, xpath_filter):
 
     try:  # Try to write the data to a file
         title = data["title"][0]
-        with open("../data/" + title + ".json", 'w', encoding="utf-8") as f:
+        with open("../download/" + title + ".json", 'w', encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)  # JSON is superior :)
+        print("Successfully wrote to file: ../download/" + title + ".json")
     except Exception as e:
         print("Couldn't write to file: " + str(e))
 

@@ -1,0 +1,1 @@
+python ../src/py_lang_detect/lang_detector.py ../src/py_lang_detect/model.bin %1

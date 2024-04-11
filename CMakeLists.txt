@@ -4,6 +4,9 @@ project(cpp_tf_idf)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ --static")
 
+include_directories(src)
+include_directories(src/cpp_indexer)
+
 # - - - - - IR - - - - -
 
 # Add lemma
@@ -103,6 +106,8 @@ add_executable(
     src/cpp_indexer/TF_IDF.cpp
     src/cpp_indexer/Indexer.h
     src/cpp_indexer/Indexer.cpp
+    src/PyHandler.h
+    src/PyHandler.cpp
     ${lemma_lib_src}
     ${stem_lib_src}
     ${imgui_files}

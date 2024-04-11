@@ -46,5 +46,8 @@ int main() {
     /* Download https://zaklinac.fandom.com/wiki/Geralt_z_Rivie */
     IndexHandler::add_doc_url(indexer, "https://zaklinac.fandom.com/wiki/Geralt_z_Rivie");
 
+    /* Detect language of the document */
+    auto lang = IndexHandler::detect_lang(indexer, 0);
+
     return EXIT_SUCCESS;
 }

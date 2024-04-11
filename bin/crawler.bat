@@ -1,0 +1,1 @@
+python ../src/py_crawler/crawler.py %1

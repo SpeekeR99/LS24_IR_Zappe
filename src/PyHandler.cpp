@@ -23,15 +23,7 @@ std::string PyHandler::run_crawler(const std::string &url) {
     return exec(cmd);
 }
 
-std::string PyHandler::run_lang_detector(const std::string &text) {
-    std::ofstream ofs("tmp_detect.txt", std::ofstream::out);
-    ofs << text;
-    ofs.close();
-
-    auto cmd = std::string(LANG_DETECTOR_BAT) + " " + MODEL_PATH + " tmp_detect.txt";
-    auto result = exec(cmd);
-
-    std::remove("tmp_detect.txt");
-
-    return result;
+std::string PyHandler::run_lang_detector(const std::string &dir) {
+    auto cmd = std::string(LANG_DETECTOR_BAT) + " " + MODEL_PATH + " " + dir;
+    return exec(cmd);
 }

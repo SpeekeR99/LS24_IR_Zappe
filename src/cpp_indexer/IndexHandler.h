@@ -64,7 +64,7 @@ public:
      * @param verbose Whether to print the progress
      * @return Documents
      */
-    static std::vector<Document> get_docs(Indexer &indexer, std::vector<int> &doc_ids, bool verbose=true);
+    static std::vector<Document> get_docs(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose=true);
 
     /**
      * Update documents in the indexer and cache
@@ -123,10 +123,18 @@ public:
 
     /**
      * Detect the language of the document
-     * @param indexer Indexer
-     * @param doc_id Document ID
+     * @param docs Documents
      * @param verbose Whether to print the progress
-     * @return Detected language
+     * @return Detected languages
      */
-    static std::string detect_lang(Indexer &indexer, int doc_id, bool verbose=true);
+    static std::vector<std::string> detect_lang(const std::vector<Document> &docs, bool verbose=true);
+
+    /**
+     * Detect the language of the document
+     * @param indexer Indexer
+     * @param doc_ids Document IDs
+     * @param verbose Whether to print the progress
+     * @return Detected languages
+     */
+    static std::vector<std::string> detect_lang(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose=true);
 };

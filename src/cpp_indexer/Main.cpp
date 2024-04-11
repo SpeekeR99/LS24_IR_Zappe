@@ -14,6 +14,9 @@ int main() {
     /* Index documents */
     auto indexer = Indexer(docs, tokenized_docs);
 
+    /* Detect languages */
+    auto langs = IndexHandler::detect_lang(docs);
+
     /* Save the index */
     IndexHandler::save_index(indexer, "../index/index1.json");
 
@@ -45,9 +48,6 @@ int main() {
 
     /* Download https://zaklinac.fandom.com/wiki/Geralt_z_Rivie */
     IndexHandler::add_doc_url(indexer, "https://zaklinac.fandom.com/wiki/Geralt_z_Rivie");
-
-    /* Detect language of the document */
-    auto lang = IndexHandler::detect_lang(indexer, 0);
 
     return EXIT_SUCCESS;
 }

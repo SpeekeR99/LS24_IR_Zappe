@@ -43,8 +43,8 @@ public:
     static std::string run_crawler(const std::string& url);
     /**
      * Run the language detector on the given text
-     * @param text Text to detect the language of
+     * @param dir Directory with the text files
      * @return Detected language
      */
-    static std::string run_lang_detector(const std::string& text);
+    static std::string run_lang_detector(const std::string& dir);
 };

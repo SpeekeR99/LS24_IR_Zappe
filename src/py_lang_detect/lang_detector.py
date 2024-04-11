@@ -1,3 +1,4 @@
+import os
 import sys
 import pickle
 from sklearn.feature_extraction.text import CountVectorizer
@@ -34,30 +35,35 @@ def main(model_path, document_path):
     """
     Main function
     :param model_path: Path to model
-    :param document_path: Path to document
+    :param document_path: Path to document dir
     """
     # Load model
     model = load_model(model_path)
 
     # Load document
-    with open(document_path, "r", encoding="utf-8", errors="ignore") as fp:
-        document = fp.read()
+    document = []
+    for file in os.listdir(document_path):
+        filepath = os.path.join(document_path, file)
+        with open(filepath, "r", encoding="utf-8") as fp:
+            document.append(fp.read())
 
     # Predict language
-    y_pred = model.predict([document])
+    y_pred = model.predict(document)
 
     # Load label2lang mapping
     label2lang = load_label2lang()
 
     # Convert label to language
-    label = label2lang[y_pred[0]]
+    labels = [label2lang[label] for label in y_pred]
 
-    print(f"Predicted language: {label}")
+    print(f"Predicted languages: {labels}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <path_to_model> <path_to_document>")
+        print(f"Usage: {sys.argv[0]} <path_to_model> <path_to_document_dir>")
         sys.exit(1)
+
+    print(sys.argv)
 
     main(sys.argv[1], sys.argv[2])

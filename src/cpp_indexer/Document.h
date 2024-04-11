@@ -28,11 +28,13 @@ public:
     std::vector<std::string> h3;
     /** Content */
     std::string content;
+    /** Language of the document */
+    std::string lang;
 
     /**
      * Default constructor
      */
-    Document() : id(-1), title(), toc(), h1(), h2(), h3(), content() {
+    Document() : id(-1), title(), toc(), h1(), h2(), h3(), content(), lang() {
         /* Nothing to do here :) */
     }
 
@@ -53,9 +55,9 @@ public:
             const std::vector<std::string> &h1,
             const std::vector<std::string> &h2,
             const std::vector<std::string> &h3,
-            std::string content
+            std::string content,
     ) :
-            id(id), title(std::move(title)), toc(toc), h1(h1), h2(h2), h3(h3), content(std::move(content)) {
+            id(id), title(std::move(title)), toc(toc), h1(h1), h2(h2), h3(h3), content(std::move(content)), lang() {
         /* Nothing to do here :) */
     }
 
@@ -109,11 +111,13 @@ public:
     std::vector<std::string> h3;
     /** Content */
     std::vector<std::string> content;
+    /** Language of the document */
+    std::string lang;
 
     /**
      * Default constructor
      */
-    TokenizedDocument() : id(-1), title(), toc(), h1(), h2(), h3(), content() {
+    TokenizedDocument() : id(-1), title(), toc(), h1(), h2(), h3(), content(), lang() {
         /* Nothing to do here :) */
     }
 
@@ -136,7 +140,7 @@ public:
             const std::vector<std::string> &h3,
             const std::vector<std::string> &content
     ) :
-            id(id), title(title), toc(toc), h1(h1), h2(h2), h3(h3), content(content) {
+            id(id), title(title), toc(toc), h1(h1), h2(h2), h3(h3), content(content), lang() {
         /* Nothing to do here :) */
     }
 

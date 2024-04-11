@@ -27,7 +27,7 @@ Nadstandardní funkčnost (lze získat až dalších 15 bodů), např.:
  - file-based index                                                                                               (DONE) (1b)
  - pozdější doindexování dat - přidání nových dat do existujícího indexu                                          (DONE) (1b)
  - ošetření HTML tagů                                                                                             (DONE) (1b)
- - detekce jazyka dotazu a indexovaných dokumentů                                                             (NOT DONE)
+ - detekce jazyka dotazu a indexovaných dokumentů                                                                 (DONE) (1b)
  - vylepšení vyhledávání                                                                                      (NOT DONE)
  - vyhledávání frází (i stop slova)                                                                           (NOT DONE)
  - vyhledávání v okolí slova                                                                                  (NOT DONE)

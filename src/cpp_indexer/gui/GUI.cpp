@@ -65,21 +65,14 @@ void GUI::init() {
 
     /* Load the font */
     this->font = io.Fonts->AddFontFromFileTTF(font_path, font_size);
-}
 
-static std::string _labelPrefix(const char* const label) {
-    float width = ImGui::CalcItemWidth();
-
-    float x = ImGui::GetCursorPosX();
-    ImGui::Text(label);
-    ImGui::SameLine();
-    ImGui::SetCursorPosX(x + width * 0.5f + ImGui::GetStyle().ItemInnerSpacing.x);
-    ImGui::SetNextItemWidth(-1);
-
-    std::string labelID = "##";
-    labelID += label;
-
-    return labelID;
+    /* Initialize the index */
+    for (const auto &entry : std::filesystem::directory_iterator("../index")) {
+        indices.emplace_back(entry.path().filename().replace_extension().string());
+        Indexer indexer = Indexer();
+        IndexHandler::load_index(indexer, entry.path().string());
+        indexers.emplace_back(indexer);
+    }
 }
 
 void GUI::render() {
@@ -149,7 +142,7 @@ void GUI::render() {
                 ImGui::SetWindowSize(ImVec2((float) window_width / 3, (float) window_height));
                 ImGui::SetWindowFontScale(font_scale);
 
-                if (ImGui::BeginCombo(_labelPrefix("Index").c_str(), indices[current_index].c_str())) {
+                if (ImGui::BeginCombo("Index", indices[current_index].c_str())) {
                     for (int i = 0; i < indices.size(); i++) {
                         bool is_selected = (current_index == i);
                         if (ImGui::Selectable(indices[i].c_str(), is_selected))
@@ -161,18 +154,18 @@ void GUI::render() {
                 }
 
                 const char *field_names[] = {"Vse", "Nadpis", "Obsah"};
-                ImGui::ListBox(_labelPrefix("Hledat v").c_str(), &current_field, field_names, IM_ARRAYSIZE(field_names));
+                ImGui::ListBox("Hledat v", &current_field, field_names, IM_ARRAYSIZE(field_names));
 
                 const char *model_names[] = {"Vektorovy", "Booleovsky"};
-                ImGui::ListBox(_labelPrefix("Model").c_str(), &current_model, model_names, IM_ARRAYSIZE(model_names));
+                ImGui::ListBox("Model", &current_model, model_names, IM_ARRAYSIZE(model_names));
 
                 if (current_model == 0) { /* Vector model */
-                    ImGui::InputInt(_labelPrefix("K nejlepsich").c_str(), &k_best);
+                    ImGui::InputInt("K nejlepsich", &k_best);
                     if (k_best < 1)
                         k_best = 1;
                 }
 
-                ImGui::Checkbox(_labelPrefix("Detekce jazyka\n(dotazu)").c_str(), &detect_language);
+                ImGui::Checkbox("Detekce jazyka\n(dotazu)", &detect_language);
 
                 ImGui::End();
 
@@ -190,6 +183,7 @@ void GUI::render() {
                 ImGui::SameLine();
                 if (ImGui::Button("Hledej")) {
 
+                    /* TODO: Search */
                     std::cout << "Hledam" << std::endl;
 
                 }
@@ -200,6 +194,75 @@ void GUI::render() {
             }
             /* Indexer tab */
             if (ImGui::BeginTabItem("Indexovani")) {
+                /* Set up the Index window */
+                ImGui::Begin("Index", nullptr,
+                             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+                /* Set up the main GUI window position, size and font size */
+                ImGui::SetWindowPos(ImVec2(0, font_size * 3));
+                ImGui::SetWindowSize(ImVec2((float) window_width / 3, (float) window_height));
+                ImGui::SetWindowFontScale(font_scale);
+
+                if (ImGui::BeginCombo("Vybrany index", indices[current_index].c_str())) {
+                    for (int i = 0; i < indices.size(); i++) {
+                        bool is_selected = (current_index == i);
+                        if (ImGui::Selectable(indices[i].c_str(), is_selected))
+                            current_index = i;
+                        if (is_selected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+
+                ImGui::InputText("Novy index", new_index_name, IM_ARRAYSIZE(new_index_name));
+                if (ImGui::Button("Vytvorit")) {
+                    indices.emplace_back(new_index_name);
+                    current_index = indices.size() - 1;
+                }
+
+                ImGui::InputText("Data", data_path, IM_ARRAYSIZE(data_path));
+                if (ImGui::Button("Nacist data")) {
+                    /* TODO: Load data */
+                }
+
+                ImGui::InputInt("ID", &current_doc);
+                if (ImGui::Button("Nacist dokument")) {
+                    /* TODO: Load document */
+                }
+
+                ImGui::End();
+
+                /* Set up the Document window */
+                ImGui::Begin("Dokument", nullptr,
+                             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+                /* Set up the main GUI window position, size and font size */
+                ImGui::SetWindowPos(ImVec2((float) window_width / 3, font_size * 3));
+                ImGui::SetWindowSize(ImVec2((float) window_width / 3 * 2, (float) window_height));
+                ImGui::SetWindowFontScale(font_scale);
+
+                /* TODO: Title; TOC; H1; H2; H3; Content; Create/Update button; Delete button */
+                ImGui::InputText("Nadpis", &current_doc_title);
+                ImGui::InputText("Osnova", &current_doc_toc);
+                ImGui::InputText("H1", &current_doc_h1);
+                ImGui::InputText("H2", &current_doc_h2);
+                ImGui::InputText("H3", &current_doc_h3);
+                ImGui::InputTextMultiline("Obsah", &current_doc_content);
+
+                if (ImGui::Button("Vytvorit/aktualizovat")) {
+                    /* TODO: Create/Update document */
+                }
+                ImGui::SameLine();
+                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+                if (ImGui::Button("Smazat")) {
+                    /* TODO: Delete document */
+                }
+                ImGui::PopStyleColor(3);
+
+                ImGui::End();
+
                 ImGui::EndTabItem();
             }
 

@@ -1,4 +1,3 @@
-#include "IndexHandler.h"
 #include "GUI.h"
 
 /**

@@ -4,11 +4,13 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+#include <filesystem>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_stdlib.h"
 #include "imgui_internal.h"
+#include "IndexHandler.h"
 
 class GUI {
 private:
@@ -57,13 +59,25 @@ private:
     static void glfw_error_callback(int error, const char *description);
 
     int current_index = 0;
-    std::vector<std::string> indices = {"index1"};
+    std::vector<std::string> indices = {};
     int current_field = 0;
     int current_model = 0;
     int k_best = 3;
     bool detect_language = false;
 
     char query[256] = "";
+
+    char new_index_name[256] = "";
+    char data_path[256] = "../data";
+    int current_doc = 0;
+    std::string current_doc_title;
+    std::string current_doc_toc;
+    std::string current_doc_h1;
+    std::string current_doc_h2;
+    std::string current_doc_h3;
+    std::string current_doc_content;
+
+    std::vector<Indexer> indexers = {};
 
 public:
     /**

@@ -77,7 +77,7 @@ Document Indexer::get_doc(int doc_id) {
         return this->doc_cache.at(doc_id);
     } catch (const std::out_of_range &e) {
         std::cerr << "[ERROR]: Document with ID " << doc_id << " not found!" << std::endl;
-        return {-1, {"NOT FOUND"}, {}, {}, {}, {}, {}};
+        return {-1, {"NENALEZENO"}, {"NENALEZENO"}, {"NENALEZENO"}, {"NENALEZENO"}, {"NENALEZENO"}, {"NENALEZENO"}};
     }
 }
 
@@ -122,6 +122,7 @@ void Indexer::remove_doc(int doc_id) {
     for (auto it = this->collection.begin(); it != this->collection.end(); it++)
         if (it->id == doc_id) {
             this->collection.erase(it);
+            this->doc_cache.erase(doc_id);
             break;
         }
     this->index_everything();
@@ -138,6 +139,7 @@ void Indexer::remove_docs(const std::vector<int> &doc_ids) {
         for (auto it = this->collection.begin(); it != this->collection.end(); it++)
             if (it->id == doc_id) {
                 this->collection.erase(it);
+                this->doc_cache.erase(doc_id);
                 break;
             }
     }

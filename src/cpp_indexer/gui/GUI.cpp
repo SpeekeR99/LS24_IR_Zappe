@@ -213,21 +213,52 @@ void GUI::render() {
                     }
                     ImGui::EndCombo();
                 }
+                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+                if (ImGui::Button("Smazat")) {
+                    std::filesystem::remove("../index/" + indices[current_index] + ".json");
+                    indices.erase(indices.begin() + current_index);
+                    indexers.erase(indexers.begin() + current_index);
+                    current_index = 0;
+                }
+                ImGui::PopStyleColor(3);
 
                 ImGui::InputText("Novy index", new_index_name, IM_ARRAYSIZE(new_index_name));
                 if (ImGui::Button("Vytvorit")) {
                     indices.emplace_back(new_index_name);
+                    Indexer indexer = Indexer();
+                    indexers.emplace_back(indexer);
                     current_index = indices.size() - 1;
                 }
 
                 ImGui::InputText("Data", data_path, IM_ARRAYSIZE(data_path));
                 if (ImGui::Button("Nacist data")) {
-                    /* TODO: Load data */
+                    auto docs = IndexHandler::load_documents(data_path);
+                    auto tokenized_docs = IndexHandler::preprocess_documents(docs);
+                    auto indexer = Indexer(docs, tokenized_docs);
+                    indexers[current_index] = indexer;
+                    IndexHandler::save_index(indexer, "../index/" + indices[current_index] + ".json");
                 }
 
-                ImGui::InputInt("ID", &current_doc);
+                ImGui::InputInt("ID", &current_doc_id);
                 if (ImGui::Button("Nacist dokument")) {
-                    /* TODO: Load document */
+                    std::vector<int> id_vec = {current_doc_id};
+                    auto doc = IndexHandler::get_docs(indexers[current_index], id_vec)[0];
+                    current_doc_title = doc.title;
+                    current_doc_toc = "";
+                    for (const auto &token : doc.toc)
+                        current_doc_toc += token + "\n";
+                    current_doc_h1 = "";
+                    for (const auto &token : doc.h1)
+                        current_doc_h1 += token + "\n";
+                    current_doc_h2 = "";
+                    for (const auto &token : doc.h2)
+                        current_doc_h2 += token + "\n";
+                    current_doc_h3 = "";
+                    for (const auto &token : doc.h3)
+                        current_doc_h3 += token + "\n";
+                    current_doc_content = doc.content;
                 }
 
                 ImGui::End();
@@ -241,23 +272,88 @@ void GUI::render() {
                 ImGui::SetWindowSize(ImVec2((float) window_width / 3 * 2, (float) window_height));
                 ImGui::SetWindowFontScale(font_scale);
 
-                /* TODO: Title; TOC; H1; H2; H3; Content; Create/Update button; Delete button */
                 ImGui::InputText("Nadpis", &current_doc_title);
-                ImGui::InputText("Osnova", &current_doc_toc);
-                ImGui::InputText("H1", &current_doc_h1);
-                ImGui::InputText("H2", &current_doc_h2);
-                ImGui::InputText("H3", &current_doc_h3);
+                ImGui::InputTextMultiline("Osnova", &current_doc_toc, ImVec2(0, font_size * 4));
+                ImGui::InputTextMultiline("H1", &current_doc_h1, ImVec2(0, font_size * 4));
+                ImGui::InputTextMultiline("H2", &current_doc_h2, ImVec2(0, font_size * 4));
+                ImGui::InputTextMultiline("H3", &current_doc_h3, ImVec2(0, font_size * 4));
                 ImGui::InputTextMultiline("Obsah", &current_doc_content);
 
-                if (ImGui::Button("Vytvorit/aktualizovat")) {
-                    /* TODO: Create/Update document */
+                if (ImGui::Button("Vytvorit")) {
+                    std::vector<std::string> toc;
+                    std::istringstream toc_stream(current_doc_toc);
+                    std::string toc_line;
+                    while (std::getline(toc_stream, toc_line))
+                        toc.emplace_back(toc_line);
+
+                    std::vector<std::string> h1;
+                    std::istringstream h1_stream(current_doc_h1);
+                    std::string h1_line;
+                    while (std::getline(h1_stream, h1_line))
+                        h1.emplace_back(h1_line);
+
+                    std::vector<std::string> h2;
+                    std::istringstream h2_stream(current_doc_h2);
+                    std::string h2_line;
+                    while (std::getline(h2_stream, h2_line))
+                        h2.emplace_back(h2_line);
+
+                    std::vector<std::string> h3;
+                    std::istringstream h3_stream(current_doc_h3);
+                    std::string h3_line;
+                    while (std::getline(h3_stream, h3_line))
+                        h3.emplace_back(h3_line);
+
+                    int id = indexers[current_index].get_collection_size();
+
+                    Document doc = {id, current_doc_title, toc, h1, h2, h3, current_doc_content};
+                    std::vector<int> id_vec = {doc.id};
+                    std::vector<Document> doc_vec = {doc};
+
+                    IndexHandler::add_docs(indexers[current_index], doc_vec);
+                    IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Aktualizovat")) {
+                    std::vector<std::string> toc;
+                    std::istringstream toc_stream(current_doc_toc);
+                    std::string toc_line;
+                    while (std::getline(toc_stream, toc_line))
+                        toc.emplace_back(toc_line);
+
+                    std::vector<std::string> h1;
+                    std::istringstream h1_stream(current_doc_h1);
+                    std::string h1_line;
+                    while (std::getline(h1_stream, h1_line))
+                        h1.emplace_back(h1_line);
+
+                    std::vector<std::string> h2;
+                    std::istringstream h2_stream(current_doc_h2);
+                    std::string h2_line;
+                    while (std::getline(h2_stream, h2_line))
+                        h2.emplace_back(h2_line);
+
+                    std::vector<std::string> h3;
+                    std::istringstream h3_stream(current_doc_h3);
+                    std::string h3_line;
+                    while (std::getline(h3_stream, h3_line))
+                        h3.emplace_back(h3_line);
+
+                    Document doc = {current_doc_id, current_doc_title, toc, h1, h2, h3, current_doc_content};
+                    std::vector<int> id_vec = {doc.id};
+                    std::vector<Document> doc_vec = {doc};
+
+                    IndexHandler::update_docs(indexers[current_index], id_vec, doc_vec);
+                    IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
                 }
                 ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
                 if (ImGui::Button("Smazat")) {
-                    /* TODO: Delete document */
+                    std::vector<int> id_vec = {current_doc_id};
+                    IndexHandler::remove_docs(indexers[current_index], id_vec);
+                    IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
                 }
                 ImGui::PopStyleColor(3);
 

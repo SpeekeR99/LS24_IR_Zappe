@@ -69,7 +69,7 @@ private:
 
     char new_index_name[256] = "";
     char data_path[256] = "../data";
-    int current_doc = 0;
+    int current_doc_id = 0;
     std::string current_doc_title;
     std::string current_doc_toc;
     std::string current_doc_h1;

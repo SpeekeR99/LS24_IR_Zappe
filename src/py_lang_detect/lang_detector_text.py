@@ -31,41 +31,28 @@ def load_label2lang():
     return label2lang
 
 
-def main(model_path, document_path):
+def main(model_path, text):
     """
     Main function
     :param model_path: Path to model
-    :param document_path: Path to document dir
+    :param text: Text to predict language
     """
     # Load model
     model = load_model(model_path)
 
-    # Load document
-    document = []
-    ids = []
-    for file in os.listdir(document_path):
-        filepath = os.path.join(document_path, file)
-        with open(filepath, "r", encoding="utf-8") as fp:
-            document.append(fp.read())
-            file_without_ext = os.path.splitext(file)[0]
-            ids.append(file_without_ext)
-
     # Predict language
-    y_pred = model.predict(document)
+    y_pred = model.predict([text])
 
     # Load label2lang mapping
     label2lang = load_label2lang()
 
-    # Convert label to language
-    labels = [label2lang[label] for label in y_pred]
-
-    result = dict(zip(ids, labels))
-    print(f"Predicted languages: {result}")
+    result = label2lang[y_pred[0]]
+    print(f"Predicted language: {result}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <path_to_model> <path_to_document_dir>")
+        print(f"Usage: {sys.argv[0]} <path_to_model> <text>")
         sys.exit(1)
 
     main(sys.argv[1], sys.argv[2])

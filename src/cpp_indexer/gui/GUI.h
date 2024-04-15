@@ -63,9 +63,10 @@ private:
     int current_field = 0;
     int current_model = 0;
     int k_best = 3;
-    bool detect_language = false;
+    bool detect_language = true;
 
     char query[256] = "";
+    std::string query_lang;
 
     char new_index_name[256] = "";
     char data_path[256] = "../data";

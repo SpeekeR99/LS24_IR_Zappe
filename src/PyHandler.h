@@ -21,6 +21,8 @@ private:
     constexpr static const char* CRAWLER_BAT = "crawler.bat";
     /** Paths to the .bat files */
     constexpr static const char* LANG_DETECTOR_BAT = "lang_detector.bat";
+    /** Paths to the .bat files */
+    constexpr static const char* LANG_DETECTOR_BAT_TEXT = "lang_detector_text.bat";
     /** Path to the language detector model */
     constexpr static const char* MODEL_PATH = "../src/py_lang_detect/model.bin";
 
@@ -45,11 +47,17 @@ public:
      */
     static std::string run_crawler(const std::string& url);
     /**
-     * Run the language detector on the given text
+     * Run the language detector on the given documents
      * @param dir Directory with the text files
      * @return Detected language
      */
     static std::string run_lang_detector(const std::string& dir);
+    /**
+     * Run the language detector on the given text
+     * @param text Text to detect the language of
+     * @return Detected language
+     */
+    static std::string run_lang_detector_text(const std::string& text);
 
     /**
      * Detect the language of the document
@@ -58,4 +66,12 @@ public:
      * @return Dictionary of IDs and detected languages
      */
     static std::unordered_map<int, std::string> detect_lang(const std::vector<Document> &docs, bool verbose=true);
+
+    /**
+     * Detect the language of the given text
+     * @param text Text
+     * @param verbose Whether to print the progress
+     * @return Detected language
+     */
+    static std::string detect_lang_text(const std::string &text, bool verbose=true);
 };

@@ -184,17 +184,3 @@ std::vector<Document> IndexHandler::search(Indexer &indexer, std::string &query,
 
     return result_docs;
 }
-
-std::unordered_map<int, std::string> IndexHandler::detect_lang(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose) {
-    if (verbose) {
-        std::cout << "Detecting language of documents with IDs: ";
-        for (auto &doc_id : doc_ids)
-            std::cout << doc_id << ", ";
-        std::cout << std::endl;
-    }
-
-    /* Get the documents */
-    auto docs = get_docs(indexer, doc_ids, false);
-
-    return PyHandler::detect_lang(docs, verbose);
-}

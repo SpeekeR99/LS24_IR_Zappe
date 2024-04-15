@@ -28,6 +28,11 @@ std::string PyHandler::run_lang_detector(const std::string &dir) {
     return exec(cmd);
 }
 
+std::string PyHandler::run_lang_detector_text(const std::string &text) {
+    auto cmd = std::string(LANG_DETECTOR_BAT_TEXT) + " " + MODEL_PATH + " " + text;
+    return exec(cmd);
+}
+
 std::unordered_map<int, std::string> PyHandler::detect_lang(const std::vector<Document> &docs, bool verbose) {
     if (verbose)
         std::cout << "Detecting language of " << docs.size() << " documents..." << std::endl;
@@ -78,4 +83,26 @@ std::unordered_map<int, std::string> PyHandler::detect_lang(const std::vector<Do
     }
 
     return langs;
+}
+
+std::string PyHandler::detect_lang_text(const std::string &text, bool verbose) {
+    if (verbose)
+        std::cout << "Detecting language of: " << text << std::endl;
+
+    auto t_start = std::chrono::high_resolution_clock::now();
+
+    /* Detect the language */
+    auto result = PyHandler::run_lang_detector_text(text);
+
+    /* Find the language in result based on print(f"Predicted language: {label}") */
+    std::string start_str = "Predicted language: ";
+    auto start = result.find(start_str);
+    auto lang = result.substr(start + start_str.size());
+
+    auto t_end = std::chrono::high_resolution_clock::now();
+
+    if (verbose)
+        std::cout << "Detected language: " << lang << "Detection done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
+
+    return lang;
 }

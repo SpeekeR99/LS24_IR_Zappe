@@ -124,11 +124,10 @@ public:
     static std::vector<Document> search(Indexer &indexer, std::string &query, FieldType field=FieldType::ALL, bool print=true);
 
     /**
-     * Detect the language of the document
-     * @param indexer Indexer
-     * @param doc_ids Document IDs
+     * Detect the language of the given text
+     * @param text Text
      * @param verbose Whether to print the progress
-     * @return Dictionary of IDs and detected languages
+     * @return Detected language
      */
-    static std::unordered_map<int, std::string> detect_lang(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose=true);
+    static std::string detect_lang(const std::string &text, bool verbose=true);
 };

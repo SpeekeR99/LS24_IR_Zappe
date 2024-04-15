@@ -182,6 +182,9 @@ void GUI::render() {
                 ImGui::InputText("##Dotaz", query, IM_ARRAYSIZE(query));
                 ImGui::SameLine();
                 if (ImGui::Button("Hledej")) {
+                    if (detect_language)
+                        query_lang = PyHandler::detect_lang_text(query);
+
                     auto index = indexers[current_index];
                     std::string query_str = query;
                     FieldType field = FieldType::ALL;
@@ -198,6 +201,9 @@ void GUI::render() {
                     }
                     this->total_results = this->search_results.size();
                 }
+
+                if (detect_language)
+                    ImGui::Text("Detekovany jazyk: %s", query_lang.c_str());
 
                 ImGui::Text("Celkem vysledku: %d", total_results);
                 ImGui::SetNextItemOpen(true, ImGuiCond_Once);

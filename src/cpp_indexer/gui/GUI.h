@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <vector>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -25,8 +26,14 @@ private:
     int window_height = 720;
     /** Fullscreen flag */
     bool fullscreen = false;
+    /** Font */
+    ImFont *font = nullptr;
+    /** Font path */
+    constexpr static const char *font_path = "../src/cpp_indexer/gui/font.ttf";
     /** Font size */
-    float font_size = 1.0f;
+    float font_size = 20.0f;
+    /** Font scale */
+    float font_scale = 1.0f;
 
     /**
      * Initialize the visualization (OpenGL, GLFW, GLEW, ImGui, ImPlot, callbacks, videomode...)
@@ -48,6 +55,15 @@ private:
      * @param description Error description
      */
     static void glfw_error_callback(int error, const char *description);
+
+    int current_index = 0;
+    std::vector<std::string> indices = {"index1"};
+    int current_field = 0;
+    int current_model = 0;
+    int k_best = 3;
+    bool detect_language = false;
+
+    char query[256] = "";
 
 public:
     /**

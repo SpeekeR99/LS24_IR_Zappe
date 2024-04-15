@@ -44,6 +44,7 @@ void Indexer::index_everything() {
 
     std::cout << "Indexing documents..." << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
+
     this->docs_to_keywords();
     this->norms.clear();
     this->title_norms.clear();

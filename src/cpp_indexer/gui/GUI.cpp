@@ -62,6 +62,24 @@ void GUI::init() {
 
     /* Background color */
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+    /* Load the font */
+    this->font = io.Fonts->AddFontFromFileTTF(font_path, font_size);
+}
+
+static std::string _labelPrefix(const char* const label) {
+    float width = ImGui::CalcItemWidth();
+
+    float x = ImGui::GetCursorPosX();
+    ImGui::Text(label);
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(x + width * 0.5f + ImGui::GetStyle().ItemInnerSpacing.x);
+    ImGui::SetNextItemWidth(-1);
+
+    std::string labelID = "##";
+    labelID += label;
+
+    return labelID;
 }
 
 void GUI::render() {
@@ -75,6 +93,9 @@ void GUI::render() {
 
     /* Render here */
     glClear(GL_COLOR_BUFFER_BIT);
+
+    /* Set the font */
+    ImGui::PushFont(this->font);
 
     /* GUI part */
     {
@@ -91,7 +112,7 @@ void GUI::render() {
         /* Set up the main GUI window position, size and font size */
         ImGui::SetWindowPos(ImVec2(0, 0));
         ImGui::SetWindowSize(ImVec2((float) window_width, (float) window_height));
-        ImGui::SetWindowFontScale(font_size);
+        ImGui::SetWindowFontScale(font_scale);
 
         /* Set up the main GUI menu bar */
         if (ImGui::BeginMenuBar()) {
@@ -117,11 +138,67 @@ void GUI::render() {
 
         /* TabBar */
         if (ImGui::BeginTabBar("##TabBar")) {
-            /* Data tab */
+            /* Search tab */
             if (ImGui::BeginTabItem("Vyhledavac")) {
+                /* Set up the main GUI configuration window */
+                ImGui::Begin("Konfigurace", nullptr,
+                             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+                /* Set up the main GUI window position, size and font size */
+                ImGui::SetWindowPos(ImVec2(0, font_size * 3));
+                ImGui::SetWindowSize(ImVec2((float) window_width / 3, (float) window_height));
+                ImGui::SetWindowFontScale(font_scale);
+
+                if (ImGui::BeginCombo(_labelPrefix("Index").c_str(), indices[current_index].c_str())) {
+                    for (int i = 0; i < indices.size(); i++) {
+                        bool is_selected = (current_index == i);
+                        if (ImGui::Selectable(indices[i].c_str(), is_selected))
+                            current_index = i;
+                        if (is_selected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+
+                const char *field_names[] = {"Vse", "Nadpis", "Obsah"};
+                ImGui::ListBox(_labelPrefix("Hledat v").c_str(), &current_field, field_names, IM_ARRAYSIZE(field_names));
+
+                const char *model_names[] = {"Vektorovy", "Booleovsky"};
+                ImGui::ListBox(_labelPrefix("Model").c_str(), &current_model, model_names, IM_ARRAYSIZE(model_names));
+
+                if (current_model == 0) { /* Vector model */
+                    ImGui::InputInt(_labelPrefix("K nejlepsich").c_str(), &k_best);
+                    if (k_best < 1)
+                        k_best = 1;
+                }
+
+                ImGui::Checkbox(_labelPrefix("Detekce jazyka\n(dotazu)").c_str(), &detect_language);
+
+                ImGui::End();
+
+                ImGui::Begin("Vyhledavani", nullptr,
+                             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+                /* Set up the main GUI window position, size and font size */
+                ImGui::SetWindowPos(ImVec2((float) window_width / 3, font_size * 3));
+                ImGui::SetWindowSize(ImVec2((float) window_width / 3 * 2, (float) window_height));
+                ImGui::SetWindowFontScale(font_scale);
+
+                ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 80, ImGui::GetCursorPosY() + 20));
+
+                ImGui::InputText("##Dotaz", query, IM_ARRAYSIZE(query));
+                ImGui::SameLine();
+                if (ImGui::Button("Hledej")) {
+
+                    std::cout << "Hledam" << std::endl;
+
+                }
+
+                ImGui::End();
+
                 ImGui::EndTabItem();
             }
-            /* Loss function tab */
+            /* Indexer tab */
             if (ImGui::BeginTabItem("Indexovani")) {
                 ImGui::EndTabItem();
             }
@@ -179,13 +256,13 @@ void GUI::render() {
                 }
             }
 
-            /* Set the font size */
-            if (ImGui::InputFloat("Velikost fontu", &font_size, 0.1f, 0.3f, "%.1f")) {
+            /* Set the font scale */
+            if (ImGui::InputFloat("Velikost fontu", &font_scale, 0.1f, 0.3f, "%.1f")) {
                 // On change, clamp the value between 1.0 and 2.0
-                if (font_size < 1.0f) font_size = 1.0f;
-                if (font_size > 2.0f) font_size = 2.0f;
+                if (font_scale < 1.0f) font_scale = 1.0f;
+                if (font_scale > 2.0f) font_scale = 2.0f;
             }
-            ImGui::SetWindowFontScale(font_size);
+            ImGui::SetWindowFontScale(font_scale);
 
             /* Colors section */
             ImGui::SeparatorText("Barvy");
@@ -217,13 +294,15 @@ void GUI::render() {
             ImGui::Begin("O aplikaci", &show_about_window,
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
                          ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse);
-            ImGui::SetWindowFontScale(font_size); // Set the font size
+            ImGui::SetWindowFontScale(font_scale); // Set the font size
             ImGui::Text("Aplikace byla vytvorena autorem:\nDominik Zappe");
             ImGui::Separator();
             ImGui::Text("Aplikace slouzi jako semestralni prace na predmet IR");
             ImGui::End();
         }
     }
+    /* Reset the font */
+    ImGui::PopFont();
 
     /* ImGui Rendering */
     ImGui::Render();

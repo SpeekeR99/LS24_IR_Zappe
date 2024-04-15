@@ -182,10 +182,36 @@ void GUI::render() {
                 ImGui::InputText("##Dotaz", query, IM_ARRAYSIZE(query));
                 ImGui::SameLine();
                 if (ImGui::Button("Hledej")) {
+                    auto index = indexers[current_index];
+                    std::string query_str = query;
+                    FieldType field = FieldType::ALL;
+                    if (current_field == 1)
+                        field = FieldType::TITLE;
+                    else if (current_field == 2)
+                        field = FieldType::CONTENT;
 
-                    /* TODO: Search */
-                    std::cout << "Hledam" << std::endl;
+                    if (current_model == 0) { /* Vector model */
+                        auto result = IndexHandler::search(index, query_str, k_best, field);
+                        this->search_results = result.first;
+                    } else { /* Boolean model */
+                        this->search_results = IndexHandler::search(index, query_str, field);
+                    }
+                    this->total_results = this->search_results.size();
+                }
 
+                ImGui::Text("Celkem vysledku: %d", total_results);
+                ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+                if (ImGui::TreeNode("Výsledky")) {
+                    for (const auto &doc : search_results) {
+                        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+                        if (ImGui::TreeNode(("Dokument " + std::to_string(doc.id)).c_str())) {
+                            ImGui::Text("Nadpis: %s", doc.title.c_str());
+                            ImGui::Text("Jazyk: %s", doc.lang.c_str());
+                            ImGui::Separator();
+                            ImGui::TreePop();
+                        }
+                    }
+                    ImGui::TreePop();
                 }
 
                 ImGui::End();
@@ -259,6 +285,12 @@ void GUI::render() {
                     for (const auto &token : doc.h3)
                         current_doc_h3 += token + "\n";
                     current_doc_content = doc.content;
+                }
+
+                ImGui::InputText("URL", url, IM_ARRAYSIZE(url));
+                if (ImGui::Button("Stahnout dokument z URL")) {
+                    IndexHandler::add_doc_url(indexers[current_index], url);
+                    IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
                 }
 
                 ImGui::End();

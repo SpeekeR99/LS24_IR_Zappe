@@ -16,7 +16,7 @@ Semestrální práce musí umožňovat zaindexování dat stažených na cvičen
 a libovolných dalších dat ve stejném formátu                                                                      (DONE)
  - Obě sady dat je možné zaindexovat nezávisle na sobě                                                            (DONE)
 
-Semestrální práce musí umožňovat zadávat dotazy z GUI nebo CLI (command line interface)                       (NOT DONE)
+Semestrální práce musí umožňovat zadávat dotazy z GUI nebo CLI (command line interface)                           (DONE)
 a při zadávání dotazů je možno vybrat index a model vyhledávání (vector space model vs. boolean model)            (DONE)
 Výsledky vyhledávání obsahují i celkový počet dokumentů, které odpovídají zadanému dotazu                         (DONE)
 
@@ -35,7 +35,7 @@ Nadstandardní funkčnost (lze získat až dalších 15 bodů), např.:
  - indexování webového obsahu - zadám web, program stáhne data                                                    (DONE) (1b)
    a rovnou je zaindexuje do existujícího indexu (2b)
  - další předzpracování normalizace                                                                               (DONE) (1b)
- - GUI/webové rozhraní                                                                                        (NOT DONE)
+ - GUI/webové rozhraní                                                                                            (DONE) (1b)
  - napovídání keywords                                                                                       (SEMI DONE)
  - podpora více polí pro dokument (např. datum, od do)                                                            (DONE) (1b)
  - zvýraznění hledaného textu v náhledu výsledků                                                              (NOT DONE)

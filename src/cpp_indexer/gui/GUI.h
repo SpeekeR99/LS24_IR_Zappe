@@ -76,8 +76,12 @@ private:
     std::string current_doc_h2;
     std::string current_doc_h3;
     std::string current_doc_content;
+    char url[256] = "";
 
     std::vector<Indexer> indexers = {};
+
+    int total_results = 0;
+    std::vector<Document> search_results = {};
 
 public:
     /**

@@ -11,7 +11,7 @@
 using json = nlohmann::json;
 
 /** Language detection is really slow */
-constexpr bool DETECT_LANG = false;
+constexpr bool DETECT_LANG = true;
 
 /**
  * Enum for the field type

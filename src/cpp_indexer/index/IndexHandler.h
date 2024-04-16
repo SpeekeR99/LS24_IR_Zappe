@@ -102,7 +102,7 @@ public:
 
     /**
      * Search for the given query (Vector space model)
-     * @param indexer_cache_pair Indexer and cache pair
+     * @param indexer Indexer
      * @param preprocessor Preprocessor object instance
      * @param query Query
      * @param k Number of results
@@ -114,7 +114,7 @@ public:
 
     /**
      * Search for the given query (Boolean model)
-     * @param indexer_cache_pair Indexer and cache pair
+     * @param indexer Indexer
      * @param preprocessor Preprocessor object instance
      * @param query Query
      * @param field Field to search in
@@ -122,4 +122,14 @@ public:
      * @return Documents and positions
      */
     static std::tuple<std::vector<Document>, std::map<std::string, std::map<int, std::vector<int>>>> search(Indexer &indexer, std::string &query, FieldType field=FieldType::ALL, bool print=true);
+
+    /**
+     * Creates the best snippet based on the given positions
+     * @param indexer Indexer
+     * @param doc_id Document ID
+     * @param positions Positions
+     * @param window_size Window size
+     * @return Snippet and Indexes to highlight
+     */
+     static std::tuple<std::string, std::vector<int>> create_snippet(Indexer &indexer, int doc_id, std::map<std::string, std::map<int, vector<int>>> &positions, int window_size);
 };

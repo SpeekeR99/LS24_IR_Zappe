@@ -150,15 +150,16 @@ void IndexHandler::print_query_results(const std::string &query, const std::pair
     std::cout << "Top " << result.first.size() << " search results for \"" << query << "\":" << std::endl;
     for (auto i = 0; i < result.first.size(); i++) {
         std::cout << "Rank: " << i + 1 << ", ID: " << result.first[i].id << ", Title: " << result.first[i].title << ", Score: " << result.second[i] << std::endl;
-        for (const auto &[word, pos] : positions) {
-            for (const auto &[doc_id, positions_map] : pos)
-                if (doc_id == result.first[i].id) {
-                    std::cout << "Word: " << word << ", Positions: ";
-                    for (const auto &p : positions_map)
-                        std::cout << p << ", ";
-                    std::cout << std::endl;
-                }
-        }
+        /* Commented out because it makes messy output */
+//        for (const auto &[word, pos] : positions) {
+//            for (const auto &[doc_id, positions_map] : pos)
+//                if (doc_id == result.first[i].id) {
+//                    std::cout << "Word: " << word << ", Positions: ";
+//                    for (const auto &p : positions_map)
+//                        std::cout << p << ", ";
+//                    std::cout << std::endl;
+//                }
+//        }
     }
     std::cout << std::endl;
 }
@@ -168,15 +169,16 @@ void IndexHandler::print_query_results(const std::string &query, std::vector<Doc
     std::cout << "Found " << result.size() << " documents" << std::endl << "Results:" << std::endl;
     for (auto &doc : result) {
         std::cout << "ID: " << doc.id << ", Title: " << doc.title << std::endl;
-        for (const auto &[word, pos] : positions) {
-            for (const auto &[doc_id, positions_map] : pos)
-                if (doc_id == doc.id) {
-                    std::cout << "Word: " << word << ", Positions: ";
-                    for (const auto &p : positions_map)
-                        std::cout << p << ", ";
-                    std::cout << std::endl;
-                }
-        }
+        /* Commented out because it makes messy output */
+//        for (const auto &[word, pos] : positions) {
+//            for (const auto &[doc_id, positions_map] : pos)
+//                if (doc_id == doc.id) {
+//                    std::cout << "Word: " << word << ", Positions: ";
+//                    for (const auto &p : positions_map)
+//                        std::cout << p << ", ";
+//                    std::cout << std::endl;
+//                }
+//        }
     }
     std::cout << std::endl;
 }
@@ -209,4 +211,52 @@ std::tuple<std::vector<Document>, std::map<std::string, std::map<int, std::vecto
         print_query_results(query, result_docs, positions);
 
     return {result_docs, positions};
+}
+
+std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &indexer, int doc_id, std::map<std::string, std::map<int, vector<int>>> &positions, int window_size) {
+    auto doc = indexer.get_doc(doc_id);
+    auto content = doc.content;
+    auto tokenized_doc = indexer.get_tokenized_doc(doc_id);
+    auto words = tokenized_doc.content;
+
+    std::tuple<int, int, int> best_window = std::make_tuple(0, window_size - 1, 0); // start, end, unique words count
+
+    /* Positions = word -> (doc_id, positions) */
+    for (const auto &[word, pos_list] : positions) {
+        for (const auto &[doc_id_, positions_] : pos_list) {
+            if (doc_id_ != doc_id)
+                continue;
+            for (const auto &pos : positions_) {
+                /* Find the window around the position */
+                int start = std::max(0, pos - window_size / 2);
+                int end = std::min((int)words.size() - 1, start + window_size - 1);
+                start = std::max(0, end - window_size + 1);
+
+                std::set<std::string> unique_words_in_window;
+                for (int i = start; i <= end; i++)
+                    if (positions.count(words[i]) > 0)
+                        unique_words_in_window.insert(words[i]);
+
+                if (unique_words_in_window.size() > std::get<2>(best_window))
+                    best_window = std::make_tuple(start, end, unique_words_in_window.size());
+            }
+        }
+    }
+
+    /* Which words in the window should be highlighted */
+    std::vector<int> highlight_indexes;
+    for (int i = std::get<0>(best_window); i <= std::get<1>(best_window); i++)
+        if (positions.count(words[i]) > 0)
+            highlight_indexes.push_back(i - std::get<0>(best_window));
+
+    std::vector<std::string> words_vec;
+    std::istringstream iss(content);
+    for (std::string s; iss >> s; )
+        words_vec.push_back(s);
+
+    std::string snippet;
+    for (int i = std::get<0>(best_window); i <= std::get<1>(best_window); i++)
+        snippet += words_vec[i] + " ";
+
+    return {snippet, highlight_indexes};
 }

@@ -5,30 +5,34 @@
  * @return Exit code
  */
 int main() {
-//    GUI gui = GUI();
-//    gui.run();
-
-    /* Load documents */
-    auto docs = IndexHandler::load_documents("../data");
-
-    /* Preprocess documents */
-    auto [tokenized_docs, positions_map] = IndexHandler::preprocess_documents(docs);
-    auto position_at_geralt = positions_map["geralt"];
-
-    /* Index documents */
-    auto indexer = Indexer(docs, tokenized_docs, positions_map);
-
-    /* Save the index */
-    IndexHandler::save_index(indexer, "../index/index1.json");
-
-    /* Load the index */
-    indexer = Indexer();
-    IndexHandler::load_index(indexer, "../index/index1.json");
-
-    /* Search "Geralt z Rivie" */
-    std::string query = "Geralt z Rivie";
-    auto [docs_result, scores, positions] = IndexHandler::search(indexer, query, 3);
-//    result = IndexHandler::search(indexer, query, 3, FieldType::TITLE);
+    GUI gui = GUI();
+    gui.run();
+//
+//    /* Load documents */
+//    auto docs = IndexHandler::load_documents("../data");
+//
+//    /* Preprocess documents */
+//    auto [tokenized_docs, positions_map] = IndexHandler::preprocess_documents(docs);
+//
+//    /* Index documents */
+//    auto indexer = Indexer(docs, tokenized_docs, positions_map);
+//
+//    /* Save the index */
+//    IndexHandler::save_index(indexer, "../index/index1.json");
+//
+//    /* Load the index */
+//    indexer = Indexer();
+//    IndexHandler::load_index(indexer, "../index/index1.json");
+//
+//    /* Search "Geralt z Rivie" */
+//    std::string query = "Geralt z Rivie";
+//    auto [docs_result, scores, positions] = IndexHandler::search(indexer, query, 3);
+//    auto [snippet, highlight_index] = IndexHandler::create_snippet(indexer, docs_result[0].id, positions, 30);
+//    std::cout << snippet << std::endl;
+//    for (const auto &index : highlight_index)
+//        std::cout << index << " ";
+//    std::cout << std::endl;
+//    std::tie(docs_result, scores, positions) = IndexHandler::search(indexer, query, 3, FieldType::TITLE);
 //
 //    /* Update the document, so it contains "Geralt z Rivie" more and so it is way more relevant (see Score print) */
 //    std::vector<int> new_doc_ids = {550};
@@ -44,9 +48,9 @@ int main() {
 //    /* Search "Geralt z Rivie" again and see how the score of others changes (also ID 550 is gone, shocking!) */
 //    result = IndexHandler::search(indexer, query, 3);
 //
-    /* Search "Geralt z Rivie" boolean */
-    query = "NOT Geralt AND (z OR NOT NOT Rivie)";
-    auto result_bool = IndexHandler::search(indexer, query);
+//    /* Search "Geralt z Rivie" boolean */
+//    query = "NOT Geralt AND (z OR NOT NOT Rivie)";
+//    auto result_bool = IndexHandler::search(indexer, query);
 //    result_bool = IndexHandler::search(indexer, query, FieldType::TITLE);
 //
 //    /* Download https://zaklinac.fandom.com/wiki/Geralt_z_Rivie */

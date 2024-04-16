@@ -38,7 +38,7 @@ Nadstandardní funkčnost (lze získat až dalších 15 bodů), např.:
  - GUI/webové rozhraní                                                                                            (DONE) (1b)
  - napovídání keywords                                                                                       (SEMI DONE)
  - podpora více polí pro dokument (např. datum, od do)                                                            (DONE) (1b)
- - zvýraznění hledaného textu v náhledu výsledků                                                              (NOT DONE)
+ - zvýraznění hledaného textu v náhledu výsledků                                                                  (DONE) (1b)
  - vlastní implementace parsování dotazů bez použití externí knihovny                                             (DONE) (1b)
  - implementace dalšího modelu (použití sémantických prostorů, doc2vec,                                       (NOT DONE)
    Transformers - BERT) atd. (1-5b podle náročnosti),

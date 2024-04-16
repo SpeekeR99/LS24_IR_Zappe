@@ -83,6 +83,9 @@ private:
 
     int total_results = 0;
     std::vector<Document> search_results = {};
+    const int snippet_window_size = 30;
+    std::vector<std::string> result_snippets = {};
+    std::vector<std::vector<int>> highlight_indices = {};
 
 public:
     /**

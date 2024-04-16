@@ -80,6 +80,12 @@ public:
      */
     Document get_doc(int doc_id);
     /**
+     * Get the tokenized document with the given ID
+     * @param doc_id Document ID
+     * @return Tokenized document with the given ID
+     */
+    TokenizedDocument get_tokenized_doc(int doc_id);
+    /**
      * Get documents with the given IDs
      * @param doc_ids Vector of document IDs
      * @return Vector of documents with the given IDs

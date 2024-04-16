@@ -77,6 +77,13 @@ Document Indexer::get_doc(int doc_id) {
     }
 }
 
+TokenizedDocument Indexer::get_tokenized_doc(int doc_id) {
+    for (const auto &doc : this->collection)
+        if (doc.id == doc_id)
+            return doc;
+    return {-1, {"NENALEZENO"}, {"NENALEZENO"}, {"NENALEZENO"}, {"NENALEZENO"}, {"NENALEZENO"}, {"NENALEZENO"}};
+}
+
 std::vector<Document> Indexer::get_docs(const std::vector<int> &doc_ids) {
     std::vector<Document> result;
     result.reserve(doc_ids.size());

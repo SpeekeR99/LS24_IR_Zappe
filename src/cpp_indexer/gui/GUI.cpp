@@ -196,9 +196,19 @@ void GUI::render() {
                     if (current_model == 0) { /* Vector model */
                         auto [result, scores, positions] = IndexHandler::search(index, query_str, k_best, field);
                         this->search_results = result;
+                        for (const auto &doc : search_results) {
+                            auto [snippet, highlight_index] = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size);
+                            result_snippets.emplace_back(snippet);
+                            highlight_indices.emplace_back(highlight_index);
+                        }
                     } else { /* Boolean model */
                         auto [result, positions] = IndexHandler::search(index, query_str, field);
                         this->search_results = result;
+                        for (const auto &doc : search_results) {
+                            auto [snippet, highlight_index] = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size);
+                            result_snippets.emplace_back(snippet);
+                            highlight_indices.emplace_back(highlight_index);
+                        }
                     }
                     this->total_results = this->search_results.size();
                 }
@@ -209,11 +219,40 @@ void GUI::render() {
                 ImGui::Text("Celkem vysledku: %d", total_results);
                 ImGui::SetNextItemOpen(true, ImGuiCond_Once);
                 if (ImGui::TreeNode("Výsledky")) {
-                    for (const auto &doc : search_results) {
+                    for (auto i = 0; i < total_results; i++) {
+                        auto doc = search_results[i];
                         ImGui::SetNextItemOpen(true, ImGuiCond_Once);
                         if (ImGui::TreeNode(("Dokument " + std::to_string(doc.id)).c_str())) {
                             ImGui::Text("Nadpis: %s", doc.title.c_str());
                             ImGui::Text("Jazyk: %s", doc.lang.c_str());
+                            auto snippet = result_snippets[i];
+                            auto highlight_index = highlight_indices[i];
+
+                            /* Iterate word by word to highlight the words */
+                            ImGui::Text("Úryvek: ...");
+                            ImGui::SameLine();
+                            std::istringstream snippet_stream(snippet);
+                            std::string word;
+                            int index = 0;
+                            int size_so_far = 0;
+                            while (std::getline(snippet_stream, word, ' ')) {
+                                auto size = ImGui::CalcTextSize(word.c_str());
+                                if (std::find(highlight_index.begin(), highlight_index.end(), index++) != highlight_index.end()) {
+                                    ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetCursorScreenPos(),
+                                                                             ImVec2(ImGui::GetCursorScreenPos().x + size.x,
+                                                                                    ImGui::GetCursorScreenPos().y + size.y),
+                                                                             IM_COL32(20, 200, 20, 128));
+                                }
+                                ImGui::Text("%s", word.c_str());
+                                size_so_far += size.x;
+                                int threshold = ImGui::GetCurrentWindow()->Size.x - 400;
+                                if (size_so_far < threshold)
+                                    ImGui::SameLine();
+                                else
+                                    size_so_far = 0;
+                            }
+                            ImGui::Text("...");
+
                             ImGui::Separator();
                             ImGui::TreePop();
                         }

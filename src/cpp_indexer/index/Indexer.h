@@ -116,9 +116,10 @@ public:
      * @param query Query tokens
      * @param k Top k results
      * @param field Field to search in
+     * @param proximity Proximity search (if 0, no proximity search)
      * @return IDs of the top k documents and their scores and positions
      */
-    [[nodiscard]] std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> search(const std::vector<std::string> &query, int k, FieldType field = FieldType::ALL) const;
+    [[nodiscard]] std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> search(const std::vector<std::string> &query, int k, FieldType field = FieldType::ALL, int proximity=0) const;
     /**
      * Search for the given query (BOOLEAN MODEL)
      * @param query_tokens Query tokens (EXPECTED postfix notation)

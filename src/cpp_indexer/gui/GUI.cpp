@@ -172,6 +172,22 @@ void GUI::render() {
 
                 ImGui::Checkbox("Detekce jazyka\n(dotazu)", &detect_language);
 
+                if (ImGui::Checkbox("Hledadni v blizkosti\n(proximity search)", &proximity_search)) {
+                    if (proximity_search && phrase_search)
+                        phrase_search = false;
+                }
+
+                if (proximity_search) {
+                    ImGui::InputInt("Vzdalenost", &proximity);
+                    if (proximity < 1)
+                        proximity = 1;
+                }
+
+                if (ImGui::Checkbox("Hledani fráze\n(phrase search)", &phrase_search)) {
+                    if (proximity_search && phrase_search)
+                        proximity_search = false;
+                }
+
                 ImGui::End();
 
                 ImGui::Begin("Vyhledavani", nullptr,
@@ -203,7 +219,15 @@ void GUI::render() {
                     highlight_indices.clear();
 
                     if (current_model == 0) { /* Vector model */
-                        auto [result, scores, positions] = IndexHandler::search(index, query, k_best, field);
+                        std::vector<Document> result;
+                        std::vector<float> scores;
+                        std::map<std::string, std::map<int, std::vector<int>>> positions;
+                        if (proximity_search)
+                            std::tie(result, scores, positions) = IndexHandler::search(index, query, k_best, field, proximity);
+                        else if (phrase_search)
+                            std::tie(result, scores, positions) = IndexHandler::search(index, query, k_best, field, 1);
+                        else
+                            std::tie(result, scores, positions) = IndexHandler::search(index, query, k_best, field);
                         this->search_results = result;
                         for (const auto &doc : search_results) {
                             auto [snippet, highlight_index] = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size);

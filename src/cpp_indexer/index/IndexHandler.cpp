@@ -184,10 +184,10 @@ void IndexHandler::print_query_results(const std::string &query, std::vector<Doc
     std::cout << std::endl;
 }
 
-std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> IndexHandler::search(Indexer &indexer, std::string &query, int k, FieldType field, bool print) {
+std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> IndexHandler::search(Indexer &indexer, std::string &query, int k, FieldType field, int proximity, bool print) {
     auto [query_tokens, _] = preprocessor.preprocess_text(query, true, false);
 
-    auto [doc_ids, scores, positions] = indexer.search(query_tokens, k, field);
+    auto [doc_ids, scores, positions] = indexer.search(query_tokens, k, field, proximity);
 
     auto result_docs = get_docs(indexer, doc_ids, false);
 

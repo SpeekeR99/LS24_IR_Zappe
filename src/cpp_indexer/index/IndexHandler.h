@@ -110,7 +110,7 @@ public:
      * @param print Whether to print the results
      * @return Documents and scores and positions
      */
-    static std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> search(Indexer &indexer, std::string &query, int k, FieldType field=FieldType::ALL, bool print=true);
+    static std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> search(Indexer &indexer, std::string &query, int k, FieldType field=FieldType::ALL, int proximity=0, bool print=true);
 
     /**
      * Search for the given query (Boolean model)

@@ -25,8 +25,8 @@ int main() {
 //    IndexHandler::load_index(indexer, "../index/index1.json");
 //
 //    /* Search "Geralt z Rivie" */
-//    std::string query = "Geralt z Rivie";
-//    auto [docs_result, scores, positions] = IndexHandler::search(indexer, query, 3);
+//    std::string query = "Geralt Rivie";
+//    auto [docs_result, scores, positions] = IndexHandler::search(indexer, query, 3, FieldType::ALL, 3);
 //    auto [snippet, highlight_index] = IndexHandler::create_snippet(indexer, docs_result[0].id, positions, 30);
 //    std::cout << snippet << std::endl;
 //    for (const auto &index : highlight_index)

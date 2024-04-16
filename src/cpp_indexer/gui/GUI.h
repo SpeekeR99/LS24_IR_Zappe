@@ -87,6 +87,10 @@ private:
     std::vector<std::string> result_snippets = {};
     std::vector<std::vector<int>> highlight_indices = {};
 
+    bool phrase_search = false;
+    bool proximity_search = false;
+    int proximity = 3;
+
 public:
     /**
      * Default constructor, calls init()

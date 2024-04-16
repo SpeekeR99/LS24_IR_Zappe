@@ -155,7 +155,7 @@ float Indexer::cosine_similarity(const std::map<std::string, float> &query, int 
     return dot / (std::sqrt(norm_query) * norm_doc);
 }
 
-std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> Indexer::search(const std::vector<std::string> &query, int k, FieldType field) const {
+std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> Indexer::search(const std::vector<std::string> &query, int k, FieldType field, int proximity) const {
     /* Calculate TF for the query */
     auto tf_query = TF_IDF::calc_tf(query);
     std::map<std::string, float> tf_idf_query;
@@ -186,19 +186,10 @@ std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<
         /* Do nothing */
     }
 
-    /* Sort results by cosine similarity */
-    std::sort(results.begin(), results.end(), [](const auto& a, const auto& b) {
-        return a.second > b.second;
-    });
-
-    /* Return top k results */
-    std::tuple<std::vector<int>, std::vector<float>, std::vector<int>> top_k;
-    if (k > results.size())
-        k = static_cast<int>(results.size());
-    for (int i = 0; i < k; i++) {
-        std::get<0>(top_k).emplace_back(results[i].first);
-        std::get<1>(top_k).emplace_back(results[i].second);
-    }
+    /* Take care of nans */
+    for (auto& [doc_id, value] : results)
+        if (std::isnan(value))
+            value = 0;
 
     /* Get positions of the words in the query */
     std::map<std::string, std::map<int, std::vector<int>>> positions;
@@ -206,6 +197,63 @@ std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<
         if (this->positions_map.find(word) != this->positions_map.end())
             positions[word] = this->positions_map.at(word);
     }
+
+    /* Postfilter results using proximity search */
+    if (proximity > 0) {
+        std::map<int, float> filtered_results_ids_prox_score;
+
+        /* For each pair of query words */
+        for (int i = 0; i < query.size(); i++) {
+            for (int j = i + 1; j < query.size(); j++) {
+                // Get the positions of the words in the documents */
+                auto &positions1 = positions[query[i]];
+                auto &positions2 = positions[query[j]];
+
+                /* For each document where both words appear */
+                for (auto &[doc_id, pos1]: positions1) {
+                    if (positions2.find(doc_id) != positions2.end()) {
+                        auto &pos2 = positions2[doc_id];
+
+                        /* For each pair of positions, calculate the distance */
+                        for (int pos_1: pos1) {
+                            for (int pos_2: pos2) {
+                                int distance = std::abs(pos_1 - pos_2);
+
+                                /* If the distance is less than or equal to the proximity, add the document to the result set */
+                                if (distance <= proximity) {
+                                    if (filtered_results_ids_prox_score.find(doc_id) == filtered_results_ids_prox_score.end())
+                                        filtered_results_ids_prox_score[doc_id] = 0;
+                                    filtered_results_ids_prox_score[doc_id] += 1.0 / (1 + distance);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        /* Replace the original results with the filtered results */
+        std::vector<std::pair<int, float>> filtered_results;
+        for (const auto& [doc_id, value]: results)
+            if (filtered_results_ids_prox_score.find(doc_id) != filtered_results_ids_prox_score.end())
+                filtered_results.emplace_back(doc_id, value + filtered_results_ids_prox_score[doc_id]);
+        results = filtered_results;
+    }
+
+    /* Sort results by cosine similarity */
+    std::sort(results.begin(), results.end(), [](const std::pair<int, float> &a, const std::pair<int, float> &b) {
+        return a.second > b.second;
+    });
+
+    /* Return top k results */
+    std::tuple<std::vector<int>, std::vector<float>, std::vector<int>> top_k;
+    if (k > results.size())
+        k = static_cast<int>(results.size());
+
+    for (int i = 0; i < k; i++) {
+        std::get<0>(top_k).emplace_back(results[i].first);
+        std::get<1>(top_k).emplace_back(results[i].second);
+    }
+
     /* Filter positions to only include the top k results */
     for (const auto& [word, pos] : positions) {
         std::map<int, std::vector<int>> temp;

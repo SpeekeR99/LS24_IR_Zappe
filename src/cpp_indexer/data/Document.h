@@ -147,6 +147,22 @@ public:
     }
 
     /**
+     * Get positions of a word in the document
+     * @param word Word
+     * @return Positions
+     */
+    std::vector<int> get_positions(const std::string &word, bool title_b = false) const {
+        std::vector<int> positions;
+        auto words = content;
+        if (title_b)
+            words = title;
+        for (auto i = 0; i < words.size(); i++)
+            if (words[i] == word)
+                positions.push_back(i);
+        return positions;
+    }
+
+    /**
      * Convert the document to JSON
      * @return JSON object
      */

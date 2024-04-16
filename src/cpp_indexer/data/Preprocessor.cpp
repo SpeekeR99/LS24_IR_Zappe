@@ -132,8 +132,9 @@ std::string &Preprocessor::remove_special_characters(std::string &text) {
     return text;
 }
 
-std::vector<std::string> Preprocessor::tokenize(const std::string &text) {
+std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Preprocessor::tokenize(const std::string &text) {
     std::vector<std::string> tokens;
+    std::map<std::string, std::vector<int>> token_positions;
     std::istringstream iss(text);
     std::string token;
 
@@ -142,6 +143,7 @@ std::vector<std::string> Preprocessor::tokenize(const std::string &text) {
         if (std::regex_match(token, wildcard_word_regex) || std::regex_match(token, url_regex) ||
             std::regex_match(token, date_regex) || std::regex_match(token, time_regex)) {
             tokens.push_back(token);
+            token_positions[token].push_back(static_cast<int>(tokens.size() - 1));
             continue;
         }
 
@@ -166,16 +168,19 @@ std::vector<std::string> Preprocessor::tokenize(const std::string &text) {
 
             std::istringstream iss(new_token);
             std::string new_subtoken;
-            while (iss >> new_subtoken)
+            while (iss >> new_subtoken) {
                 tokens.push_back(new_subtoken);
+                token_positions[new_subtoken].push_back(static_cast<int>(tokens.size() - 1));
+            }
 
             continue;
         }
 
         tokens.push_back(token);
+        token_positions[token].push_back(static_cast<int>(tokens.size() - 1));
     }
 
-    return tokens;
+    return {tokens, token_positions};
 }
 
 std::string Preprocessor::stem(const std::string& word) {
@@ -221,7 +226,7 @@ std::vector<std::string> &Preprocessor::remove_duplicates(std::vector<std::strin
     return words;
 }
 
-std::vector<std::string> Preprocessor::preprocess_text(std::string text, bool lemma, bool content) {
+std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Preprocessor::preprocess_text(std::string text, bool lemma, bool content) {
     /* Lower case */
     text = this->to_lower(text);
 
@@ -230,7 +235,7 @@ std::vector<std::string> Preprocessor::preprocess_text(std::string text, bool le
     /* But enabled because of bonus points for semestral work */
 
     /* Tokenize */
-    auto tokens = this->tokenize(text);
+    auto [tokens, token_positions] = this->tokenize(text);
 
     /* Stem or lemmatize */
     if (content) {
@@ -241,17 +246,17 @@ std::vector<std::string> Preprocessor::preprocess_text(std::string text, bool le
     }
 
     /* Remove stopwords */
-    if (content)
-        tokens = this->remove_stopwords(tokens);
+//    if (content)
+//        tokens = this->remove_stopwords(tokens); /* Disabled because we need stopwords for positional index */
 
     /* Remove duplicates */
 //    if (content)
 //        tokens = this->remove_duplicates(tokens); /* Disabled because we need duplicates for TF */
 
-    return tokens;
+    return {tokens, token_positions};
 }
 
-std::vector<std::string> Preprocessor::preprocess_text(const std::vector<std::string> &text, bool lemma, bool content) {
+std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Preprocessor::preprocess_text(const std::vector<std::string> &text, bool lemma, bool content) {
     std::string combined = std::accumulate(text.begin(), text.end(), std::string(" "));
     return preprocess_text(combined, lemma, content);
 }
@@ -330,7 +335,7 @@ std::vector<std::string> Preprocessor::parse_bool_query(const string &query) {
                 }
                 operators.emplace_back(operators_map[Operator::OR]);
             }
-            auto preprocessed_token = preprocess_text(token, true, false);
+            auto [preprocessed_token, _] = preprocess_text(token, true, false);
             tokens.push_back(preprocessed_token[0]);
             is_operator = false;
             is_and_or = false;

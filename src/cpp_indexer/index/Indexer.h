@@ -11,7 +11,7 @@
 using json = nlohmann::json;
 
 /** Language detection is really slow */
-constexpr bool DETECT_LANG = true;
+constexpr bool DETECT_LANG = false;
 
 /**
  * Enum for the field type
@@ -39,6 +39,8 @@ private:
     std::map<int, float> norms;
     /** Title norms (cosine similarity) */
     std::map<int, float> title_norms;
+    /** Map of word -> (doc_id, positions) */
+    std::map<std::string, std::map<int, std::vector<int>>> positions_map;
 
     /**
      * Adds words from the collection to the keywords
@@ -62,19 +64,15 @@ public:
      * Constructor for the Indexer class
      * @param original_collection Original collection of documents
      * @param tokenized_collection Tokenized collection of documents
+     * @param positions_map Map of word -> (doc_id, positions)
      */
-    Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection);
+    Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection, std::map<std::string, std::map<int, std::vector<int>>> &positions_map);
 
-    /**
-     * Add a document to the collection
-     * @param doc Document to add
-     */
-    void add_doc(const Document &doc, const TokenizedDocument &tokenized_doc);
     /**
      * Add documents to the collection
      * @param docs Documents to add
      */
-    void add_docs(const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs);
+    void add_docs(const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs, std::map<std::string, std::map<int, std::vector<int>>> &positions_map);
     /**
      * Get the document with the given ID
      * @param doc_id Document ID
@@ -88,22 +86,11 @@ public:
      */
     std::vector<Document> get_docs(const std::vector<int> &doc_ids);
     /**
-     * Update the document with the given ID
-     * @param doc_id Document ID
-     * @param doc New document
-     */
-    void update_doc(int doc_id, const Document& doc, const TokenizedDocument &tokenized_doc);
-    /**
      * Update documents with the given IDs
      * @param doc_ids Vector of document IDs
      * @param docs Vector of new documents
      */
-    void update_docs(const std::vector<int> &doc_ids, const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs);
-    /**
-     * Remove the document with the given ID
-     * @param doc_id Document ID
-     */
-    void remove_doc(int doc_id);
+    void update_docs(const std::vector<int> &doc_ids, const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs, std::map<std::string, std::map<int, std::vector<int>>> &positions_map);
     /**
      * Remove documents with the given IDs
      * @param doc_ids Vector of document IDs
@@ -123,16 +110,16 @@ public:
      * @param query Query tokens
      * @param k Top k results
      * @param field Field to search in
-     * @return IDs of the top k documents and their scores
+     * @return IDs of the top k documents and their scores and positions
      */
-    [[nodiscard]] std::pair<std::vector<int>, std::vector<float>> search(const std::vector<std::string> &query, int k, FieldType field = FieldType::ALL) const;
+    [[nodiscard]] std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> search(const std::vector<std::string> &query, int k, FieldType field = FieldType::ALL) const;
     /**
      * Search for the given query (BOOLEAN MODEL)
      * @param query_tokens Query tokens (EXPECTED postfix notation)
      * @param field Field to search in
-     * @return IDs of the documents that fulfill the query conditions
+     * @return IDs of the documents that fulfill the query conditions and their positions
      */
-    [[nodiscard]] std::vector<int> search(const std::vector<std::string> &query_tokens, FieldType field = FieldType::ALL) const;
+    [[nodiscard]] std::tuple<std::vector<int>, std::map<std::string, std::map<int, std::vector<int>>>> search(const std::vector<std::string> &query_tokens, FieldType field = FieldType::ALL) const;
 
     /**
      * Indexer to json

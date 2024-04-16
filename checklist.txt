@@ -34,7 +34,7 @@ Nadstandardní funkčnost (lze získat až dalších 15 bodů), např.:
  - více scoring modelů                                                                                        (NOT DONE)
  - indexování webového obsahu - zadám web, program stáhne data                                                    (DONE) (1b)
    a rovnou je zaindexuje do existujícího indexu (2b)
- - další předzpracování normalizace                                                                               (DONE) (1b)
+ - další předzpracování normalizace                                                                           (NOT DONE)
  - GUI/webové rozhraní                                                                                            (DONE) (1b)
  - napovídání keywords                                                                                       (SEMI DONE)
  - podpora více polí pro dokument (např. datum, od do)                                                            (DONE) (1b)

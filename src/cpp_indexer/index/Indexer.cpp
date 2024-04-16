@@ -1,11 +1,13 @@
 #include "Indexer.h"
 
-Indexer::Indexer() : collection(std::vector<TokenizedDocument>()), keywords(), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
+#include <utility>
+
+Indexer::Indexer() : collection(std::vector<TokenizedDocument>()), keywords(), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()), positions_map() {
     /* Nothing to do here :) */
 }
 
-Indexer::Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection) : collection(std::vector<TokenizedDocument>()), keywords(), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()) {
-    this->add_docs(original_collection, tokenized_collection);
+Indexer::Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection, std::map<std::string, std::map<int, std::vector<int>>> &positions_map) : collection(std::vector<TokenizedDocument>()), keywords(), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()), positions_map() {
+    this->add_docs(original_collection, tokenized_collection, positions_map);
 }
 
 void Indexer::docs_to_keywords() {
@@ -57,18 +59,12 @@ void Indexer::index_everything() {
     std::cout << "Indexing done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
 }
 
-
-void Indexer::add_doc(const Document &doc, const TokenizedDocument &tokenized_doc) {
-    this->doc_cache.insert({doc.id, doc});
-    this->collection.emplace_back(tokenized_doc);
-    this->index_everything();
-}
-
-void Indexer::add_docs(const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs) {
+void Indexer::add_docs(const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs, std::map<std::string, std::map<int, std::vector<int>>> &positions_map) {
     for (int i = 0; i < docs.size(); i++) {
         this->doc_cache.insert({docs[i].id, docs[i]});
         this->collection.emplace_back(tokenized_docs[i]);
     }
+    this->positions_map = std::move(positions_map);
     this->index_everything();
 }
 
@@ -89,18 +85,7 @@ std::vector<Document> Indexer::get_docs(const std::vector<int> &doc_ids) {
     return result;
 }
 
-void Indexer::update_doc(int doc_id, const Document &doc, const TokenizedDocument &tokenized_doc) {
-    this->doc_cache.erase(doc_id);
-    this->doc_cache.insert({doc_id, doc});
-
-    for (auto &d : this->collection)
-        if (d.id == doc_id)
-            d = tokenized_doc;
-
-    this->index_everything();
-}
-
-void Indexer::update_docs(const std::vector<int> &doc_ids, const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs) {
+void Indexer::update_docs(const std::vector<int> &doc_ids, const std::vector<Document> &docs, const std::vector<TokenizedDocument> &tokenized_docs, std::map<std::string, std::map<int, std::vector<int>>> &positions_map) {
     for (int i = 0; i < doc_ids.size(); i++) {
         this->doc_cache.erase(doc_ids[i]);
         this->doc_cache.insert({doc_ids[i], docs[i]});
@@ -109,22 +94,7 @@ void Indexer::update_docs(const std::vector<int> &doc_ids, const std::vector<Doc
             if (d.id == doc_ids[i])
                 d = tokenized_docs[i];
     }
-    this->index_everything();
-}
-
-void Indexer::remove_doc(int doc_id) {
-    try {
-        this->doc_cache.at(doc_id);
-    } catch (const std::out_of_range &e) {
-        std::cerr << "[ERROR]: Document with ID " << doc_id << " not found!" << std::endl;
-        return;
-    }
-    for (auto it = this->collection.begin(); it != this->collection.end(); it++)
-        if (it->id == doc_id) {
-            this->collection.erase(it);
-            this->doc_cache.erase(doc_id);
-            break;
-        }
+    this->positions_map = std::move(positions_map);
     this->index_everything();
 }
 
@@ -140,6 +110,11 @@ void Indexer::remove_docs(const std::vector<int> &doc_ids) {
             if (it->id == doc_id) {
                 this->collection.erase(it);
                 this->doc_cache.erase(doc_id);
+                break;
+            }
+        for (auto it = this->positions_map.begin(); it != this->positions_map.end(); it++)
+            if (it->second.begin()->first == doc_id) {
+                this->positions_map.erase(it);
                 break;
             }
     }
@@ -173,7 +148,7 @@ float Indexer::cosine_similarity(const std::map<std::string, float> &query, int 
     return dot / (std::sqrt(norm_query) * norm_doc);
 }
 
-std::pair<std::vector<int>, std::vector<float>> Indexer::search(const std::vector<std::string> &query, int k, FieldType field) const {
+std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> Indexer::search(const std::vector<std::string> &query, int k, FieldType field) const {
     /* Calculate TF for the query */
     auto tf_query = TF_IDF::calc_tf(query);
     std::map<std::string, float> tf_idf_query;
@@ -210,18 +185,34 @@ std::pair<std::vector<int>, std::vector<float>> Indexer::search(const std::vecto
     });
 
     /* Return top k results */
-    std::pair<std::vector<int>, std::vector<float>> top_k;
+    std::tuple<std::vector<int>, std::vector<float>, std::vector<int>> top_k;
     for (int i = 0; i < k; i++) {
-        top_k.first.emplace_back(results[i].first);
-        top_k.second.emplace_back(results[i].second);
+        std::get<0>(top_k).emplace_back(results[i].first);
+        std::get<1>(top_k).emplace_back(results[i].second);
     }
 
-    return top_k;
+    /* Get positions of the words in the query */
+    std::map<std::string, std::map<int, std::vector<int>>> positions;
+    for (const auto& word : query) {
+        if (this->positions_map.find(word) != this->positions_map.end())
+            positions[word] = this->positions_map.at(word);
+    }
+    /* Filter positions to only include the top k results */
+    for (const auto& [word, pos] : positions) {
+        std::map<int, std::vector<int>> temp;
+        for (const auto& [doc_id, positions_] : pos)
+            if (std::find(std::get<0>(top_k).begin(), std::get<0>(top_k).end(), doc_id) != std::get<0>(top_k).end())
+                temp[doc_id] = positions_;
+        positions[word] = temp;
+    }
+
+    return {std::get<0>(top_k), std::get<1>(top_k), positions};
 }
 
-std::vector<int> Indexer::search(const std::vector<std::string> &query_tokens, FieldType field) const {
+std::tuple<std::vector<int>, std::map<std::string, std::map<int, std::vector<int>>>> Indexer::search(const std::vector<std::string> &query_tokens, FieldType field) const {
     /* Stack approach thanks to postfix notation */
     std::vector<std::vector<int>> results;
+    std::vector<std::string> query_words;
 
     /* For each token in the query (in postfix notation) */
     for (const auto &token : query_tokens) {
@@ -276,6 +267,7 @@ std::vector<int> Indexer::search(const std::vector<std::string> &query_tokens, F
                 for (const auto &[doc_id, _] : this->index.at(token).doc_tf_idf)
                     result.emplace_back(doc_id);
                 results.emplace_back(result);
+                query_words.emplace_back(token);
                 continue;
             /* If the word is in the title index, push the result to the stack */
             /* Also use this only for ALL and TITLE fields => not for CONTENT */
@@ -284,6 +276,7 @@ std::vector<int> Indexer::search(const std::vector<std::string> &query_tokens, F
                 for (const auto &[doc_id, _]: this->title_index.at(token).doc_tf_idf)
                     result.emplace_back(doc_id);
                 results.emplace_back(result);
+                query_words.emplace_back(token);
             /* If the word is not in the index, push an empty result to the stack */
             } else {
                 results.emplace_back();
@@ -291,7 +284,22 @@ std::vector<int> Indexer::search(const std::vector<std::string> &query_tokens, F
         }
     }
 
-    return results.back();
+    /* Positions of the words in the query */
+    std::map<std::string, std::map<int, std::vector<int>>> positions;
+    for (const auto& word : query_words) {
+        if (this->positions_map.find(word) != this->positions_map.end())
+            positions[word] = this->positions_map.at(word);
+    }
+    /* Filter positions to only include the result documents */
+    for (const auto& [word, pos] : positions) {
+        std::map<int, std::vector<int>> temp;
+        for (const auto& [doc_id, positions_] : pos)
+            if (std::find(results.back().begin(), results.back().end(), doc_id) != results.back().end())
+                temp[doc_id] = positions_;
+        positions[word] = temp;
+    }
+
+    return {results.back(), positions};
 }
 
 json Indexer::to_json() const {
@@ -310,6 +318,15 @@ json Indexer::to_json() const {
         j["title_index"][word] = element.to_json();
     j["norms"] = this->norms;
     j["title_norms"] = this->title_norms;
+    j["positions_map"] = json::object();
+    for (const auto& [word, doc_positions] : this->positions_map) {
+        j["positions_map"][word] = json::object();
+        for (const auto& [doc_id, positions] : doc_positions) {
+            j["positions_map"][word][std::to_string(doc_id)] = json::array();
+            for (const auto& pos : positions)
+                j["positions_map"][word][std::to_string(doc_id)].push_back(pos);
+        }
+    }
     return j;
 }
 
@@ -334,6 +351,18 @@ void Indexer::from_json(const json &j) {
         this->title_index.insert({element.key(), map_element::from_json(element.value())});
     this->norms = j.at("norms").get<std::map<int, float>>();
     this->title_norms = j.at("title_norms").get<std::map<int, float>>();
+    this->positions_map = std::map<std::string, std::map<int, std::vector<int>>>();
+    temp = j.at("positions_map");
+    for (const auto& [word, doc_positions] : temp.items()) {
+        std::map<int, std::vector<int>> temp_map;
+        for (const auto& [doc_id, positions] : doc_positions.items()) {
+            std::vector<int> temp_vec;
+            for (const auto& pos : positions)
+                temp_vec.push_back(pos);
+            temp_map[std::stoi(doc_id)] = temp_vec;
+        }
+        this->positions_map[word] = temp_map;
+    }
 }
 
 int Indexer::get_collection_size() const {

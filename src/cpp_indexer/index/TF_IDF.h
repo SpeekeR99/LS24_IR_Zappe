@@ -3,6 +3,7 @@
 #include <map>
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include "Document.h"
 
 /**
@@ -21,9 +22,8 @@ struct map_element {
     [[nodiscard]] json to_json() const {
         json j;
         j["idf"] = idf;
-        for (const auto &pair: doc_tf_idf) {
+        for (const auto &pair: doc_tf_idf)
             j["doc_tf_idf"].push_back({pair.first, pair.second});
-        }
         return j;
     }
     /**

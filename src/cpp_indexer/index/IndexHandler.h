@@ -22,9 +22,9 @@ public:
      * @param preprocessor Preprocessor object instance
      * @param docs Documents to preprocess
      * @param verbose Whether to print the progress
-     * @return Tokenized documents (preprocessed)
+     * @return Tokenized documents (preprocessed), positions of words in documents
      */
-    static std::vector<TokenizedDocument> preprocess_documents(std::vector<Document> &docs, bool verbose=true);
+    static std::pair<std::vector<TokenizedDocument>, std::map<std::string, std::map<int, std::vector<int>>>> preprocess_documents(std::vector<Document> &docs, bool verbose=true);
 
     /**
      * Save the index to the given path
@@ -88,17 +88,17 @@ public:
      * Print the search results for the given query (Vector space model)
      * @param query Query
      * @param result Result
-     * @param indexer Indexer
-     * @param doc_cache Document cache
+     * @param positions Positions
      */
-    static void print_query_results(const std::string &query, const std::pair<std::vector<Document>, std::vector<float>> &result);
+    static void print_query_results(const std::string &query, const std::pair<std::vector<Document>, std::vector<float>> &result, std::map<std::string, std::map<int, std::vector<int>>> &positions);
 
     /**
      * Print the search results for the given query (Boolean model)
      * @param query  Query
      * @param result Result
+     * @param positions Positions
      */
-    static void print_query_results(const std::string &query, std::vector<Document> &result);
+    static void print_query_results(const std::string &query, std::vector<Document> &result, std::map<std::string, std::map<int, std::vector<int>>> &positions);
 
     /**
      * Search for the given query (Vector space model)
@@ -108,9 +108,9 @@ public:
      * @param k Number of results
      * @param field Field to search in
      * @param print Whether to print the results
-     * @return Pair of documents and scores
+     * @return Documents and scores and positions
      */
-    static std::pair<std::vector<Document>, std::vector<float>> search(Indexer &indexer, std::string &query, int k, FieldType field=FieldType::ALL, bool print=true);
+    static std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> search(Indexer &indexer, std::string &query, int k, FieldType field=FieldType::ALL, bool print=true);
 
     /**
      * Search for the given query (Boolean model)
@@ -119,15 +119,7 @@ public:
      * @param query Query
      * @param field Field to search in
      * @param print Whether to print the results
-     * @return Documents
+     * @return Documents and positions
      */
-    static std::vector<Document> search(Indexer &indexer, std::string &query, FieldType field=FieldType::ALL, bool print=true);
-
-    /**
-     * Detect the language of the given text
-     * @param text Text
-     * @param verbose Whether to print the progress
-     * @return Detected language
-     */
-    static std::string detect_lang(const std::string &text, bool verbose=true);
+    static std::tuple<std::vector<Document>, std::map<std::string, std::map<int, std::vector<int>>>> search(Indexer &indexer, std::string &query, FieldType field=FieldType::ALL, bool print=true);
 };

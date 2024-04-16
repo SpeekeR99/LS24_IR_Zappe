@@ -70,19 +70,19 @@ std::map<std::string, map_element> TF_IDF::calc_tf_idf(const std::vector<Tokeniz
     }
 
     /* Store TF-IDF in a map */
-    std::map<std::string, map_element> tf_idf;
+    std::map<std::string, map_element> map_ele;
     for (const auto &[doc_id, doc_tf_idf] : tf_idf_docs) {
         float norm = 0;
         for (const auto &[word, value] : doc_tf_idf) {
-            tf_idf[word].doc_tf_idf.emplace_back(doc_id, value);
+            map_ele[word].doc_tf_idf.emplace_back(doc_id, value);
 
             norm += value * value;
         }
         norms[doc_id] = std::sqrt(norm);
     }
     /* Store IDF too, for easy query TF-IDF calculation */
-    for (auto &[word, value] : tf_idf)
+    for (auto &[word, value] : map_ele)
         value.idf = idf[word];
 
-    return tf_idf;
+    return map_ele;
 }

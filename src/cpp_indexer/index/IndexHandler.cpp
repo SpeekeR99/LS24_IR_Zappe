@@ -18,22 +18,29 @@ std::vector<Document> IndexHandler::load_documents(const std::string &dir_path, 
     return docs;
 }
 
-std::vector<TokenizedDocument> IndexHandler::preprocess_documents(std::vector<Document> &docs, bool verbose) {
+std::pair<std::vector<TokenizedDocument>, std::map<std::string, std::map<int, std::vector<int>>>> IndexHandler::preprocess_documents(std::vector<Document> &docs, bool verbose) {
     if (verbose)
         std::cout << "Preprocessing documents..." << std::endl;
     auto t_start = std::chrono::high_resolution_clock::now();
 
     auto tokenized_docs = std::vector<TokenizedDocument>();
-    for (auto &doc : docs)
-        tokenized_docs.emplace_back(
-                doc.id,
-                preprocessor.preprocess_text(doc.title, true, false),
-                preprocessor.preprocess_text(doc.toc, true, false),
-                preprocessor.preprocess_text(doc.h1, true, false),
-                preprocessor.preprocess_text(doc.h2, true, false),
-                preprocessor.preprocess_text(doc.h3, true, false),
-                preprocessor.preprocess_text(doc.content, true, true)
-        );
+    std::map<int, std::map<std::string, std::vector<int>>> positions;
+    for (auto &doc : docs) {
+        auto [title, title_pos] = preprocessor.preprocess_text(doc.title, true, false);
+        auto [toc, toc_pos] = preprocessor.preprocess_text(doc.toc, true, false);
+        auto [h1, h1_pos] = preprocessor.preprocess_text(doc.h1, true, false);
+        auto [h2, h2_pos] = preprocessor.preprocess_text(doc.h2, true, false);
+        auto [h3, h3_pos] = preprocessor.preprocess_text(doc.h3, true, false);
+        auto [content, content_pos] = preprocessor.preprocess_text(doc.content, true, true);
+        tokenized_docs.emplace_back(doc.id, title, toc, h1, h2, h3, content);
+        positions[doc.id] = content_pos;
+    }
+
+    /* Transform positions to a map of word -> (doc_id, positions) */
+    std::map<std::string, std::map<int, std::vector<int>>> positions_map;
+    for (const auto& [doc_id, doc_positions] : positions)
+        for (const auto& [word, pos] : doc_positions)
+            positions_map[word][doc_id] = pos;
 
     auto t_end = std::chrono::high_resolution_clock::now();
     if (verbose) {
@@ -41,7 +48,7 @@ std::vector<TokenizedDocument> IndexHandler::preprocess_documents(std::vector<Do
         std::cout << "Preprocessing done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
     }
 
-    return tokenized_docs;
+    return {tokenized_docs, positions_map};
 }
 
 void IndexHandler::save_index(Indexer &indexer, const string &index_path) {
@@ -84,7 +91,6 @@ void IndexHandler::add_doc_url(Indexer &indexer, const string &url, bool verbose
     /* Load and preprocess the downloaded document */
     auto doc = DataLoader::load_json_document(file);
     auto doc_vec = std::vector<Document>{doc};
-    auto tokenized_doc_vec = preprocess_documents(doc_vec, false);
 
     /* Add the document to the indexer */
     add_docs(indexer, doc_vec, verbose);
@@ -98,9 +104,9 @@ void IndexHandler::add_docs(Indexer &indexer, std::vector<Document> &docs, bool 
         std::cout << std::endl;
     }
 
-    auto tokenized_docs = preprocess_documents(docs, false);
+    auto [tokenized_docs, positions] = preprocess_documents(docs, false);
 
-    indexer.add_docs(docs, tokenized_docs);
+    indexer.add_docs(docs, tokenized_docs, positions);
 }
 
 std::vector<Document> IndexHandler::get_docs(Indexer &indexer, const std::vector<int> &doc_ids, bool verbose) {
@@ -124,9 +130,9 @@ void IndexHandler::update_docs(Indexer &indexer, std::vector<int> &doc_ids, std:
         std::cout << std::endl;
     }
 
-    auto tokenized_docs = preprocess_documents(docs, false);
+    auto [tokenized_docs, positions] = preprocess_documents(docs, false);
 
-    indexer.update_docs(doc_ids, docs, tokenized_docs);
+    indexer.update_docs(doc_ids, docs, tokenized_docs, positions);
 }
 
 void IndexHandler::remove_docs(Indexer &indexer, std::vector<int> &doc_ids, bool verbose) {
@@ -140,47 +146,67 @@ void IndexHandler::remove_docs(Indexer &indexer, std::vector<int> &doc_ids, bool
     indexer.remove_docs(doc_ids);
 }
 
-void IndexHandler::print_query_results(const std::string &query, const std::pair<std::vector<Document>, std::vector<float>> &result) {
+void IndexHandler::print_query_results(const std::string &query, const std::pair<std::vector<Document>, std::vector<float>> &result, std::map<std::string, std::map<int, std::vector<int>>> &positions) {
     std::cout << "Top " << result.first.size() << " search results for \"" << query << "\":" << std::endl;
-    for (auto i = 0; i < result.first.size(); i++)
+    for (auto i = 0; i < result.first.size(); i++) {
         std::cout << "Rank: " << i + 1 << ", ID: " << result.first[i].id << ", Title: " << result.first[i].title << ", Score: " << result.second[i] << std::endl;
+        for (const auto &[word, pos] : positions) {
+            for (const auto &[doc_id, positions_map] : pos)
+                if (doc_id == result.first[i].id) {
+                    std::cout << "Word: " << word << ", Positions: ";
+                    for (const auto &p : positions_map)
+                        std::cout << p << ", ";
+                    std::cout << std::endl;
+                }
+        }
+    }
     std::cout << std::endl;
 }
 
-void IndexHandler::print_query_results(const std::string &query, std::vector<Document> &result) {
+void IndexHandler::print_query_results(const std::string &query, std::vector<Document> &result, std::map<std::string, std::map<int, std::vector<int>>> &positions) {
     std::cout << "Documents that contain \"" << query << "\":" << std::endl;
     std::cout << "Found " << result.size() << " documents" << std::endl << "Results:" << std::endl;
-    for (auto &doc : result)
+    for (auto &doc : result) {
         std::cout << "ID: " << doc.id << ", Title: " << doc.title << std::endl;
+        for (const auto &[word, pos] : positions) {
+            for (const auto &[doc_id, positions_map] : pos)
+                if (doc_id == doc.id) {
+                    std::cout << "Word: " << word << ", Positions: ";
+                    for (const auto &p : positions_map)
+                        std::cout << p << ", ";
+                    std::cout << std::endl;
+                }
+        }
+    }
     std::cout << std::endl;
 }
 
-std::pair<std::vector<Document>, std::vector<float>> IndexHandler::search(Indexer &indexer, std::string &query, int k, FieldType field, bool print) {
-    auto query_tokens = preprocessor.preprocess_text(query, true, false);
+std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> IndexHandler::search(Indexer &indexer, std::string &query, int k, FieldType field, bool print) {
+    auto [query_tokens, _] = preprocessor.preprocess_text(query, true, false);
 
-    auto result = indexer.search(query_tokens, k, field);
+    auto [doc_ids, scores, positions] = indexer.search(query_tokens, k, field);
 
-    auto result_docs = get_docs(indexer, result.first, false);
+    auto result_docs = get_docs(indexer, doc_ids, false);
 
     if (print)
-        print_query_results(query, {result_docs, result.second});
+        print_query_results(query, {result_docs, scores}, positions);
 
-    return {result_docs, result.second};
+    return {result_docs, scores, positions};
 }
 
-std::vector<Document> IndexHandler::search(Indexer &indexer, std::string &query, FieldType field, bool print) {
+std::tuple<std::vector<Document>, std::map<std::string, std::map<int, std::vector<int>>>> IndexHandler::search(Indexer &indexer, std::string &query, FieldType field, bool print) {
     std::cout << "Query: " << query << std::endl << "Postfix notation: ";
     auto bool_tokens = preprocessor.parse_bool_query(query);
     for (auto &token : bool_tokens)
         std::cout << token << " ";
     std::cout << std::endl;
 
-    auto result_ids = indexer.search(bool_tokens, field);
+    auto [result_ids, positions] = indexer.search(bool_tokens, field);
 
     auto result_docs = get_docs(indexer, result_ids, false);
 
     if (print)
-        print_query_results(query, result_docs);
+        print_query_results(query, result_docs, positions);
 
-    return result_docs;
+    return {result_docs, positions};
 }

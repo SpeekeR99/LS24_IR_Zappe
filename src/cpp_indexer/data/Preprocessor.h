@@ -103,11 +103,11 @@ public:
      */
     std::string &remove_special_characters(std::string &text);
     /**
-     * Tokenize the given text
+     * Tokenize the given text and return the tokens with their positions
      * @param text Input text
      * @return Tokens
      */
-    std::vector<std::string> tokenize(const std::string &text);
+    std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> tokenize(const std::string &text);
     /**
      * Stem the given word
      * @param word Input word
@@ -146,12 +146,20 @@ public:
     std::vector<std::string> &remove_duplicates(std::vector<std::string> &words);
     /**
      * Preprocess the given text
+     * @param text Input text
+     * @param lemma Whether to lemmatize the text
+     * @param content Whether to preprocess the content of the text
+     * @return Preprocessed text with tokens and their positions
      */
-    std::vector<std::string> preprocess_text(std::string text, bool lemma=true, bool content=false);
+    std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> preprocess_text(std::string text, bool lemma=true, bool content=false);
     /**
      * Preprocess the given vector of words, phrases or sentences
+     * @param text Input vector of words, phrases or sentences
+     * @param lemma Whether to lemmatize the text
+     * @param content Whether to preprocess the content of the text
+     * @return Preprocessed text with tokens and their positions
      */
-    std::vector<std::string> preprocess_text(const std::vector<std::string> &text, bool lemma=true, bool content=false);
+    std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> preprocess_text(const std::vector<std::string> &text, bool lemma=true, bool content=false);
 
     /**
      * Parse the given boolean query into postfix notation

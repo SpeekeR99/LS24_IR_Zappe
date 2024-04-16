@@ -194,10 +194,11 @@ void GUI::render() {
                         field = FieldType::CONTENT;
 
                     if (current_model == 0) { /* Vector model */
-                        auto result = IndexHandler::search(index, query_str, k_best, field);
-                        this->search_results = result.first;
+                        auto [result, scores, positions] = IndexHandler::search(index, query_str, k_best, field);
+                        this->search_results = result;
                     } else { /* Boolean model */
-                        this->search_results = IndexHandler::search(index, query_str, field);
+                        auto [result, positions] = IndexHandler::search(index, query_str, field);
+                        this->search_results = result;
                     }
                     this->total_results = this->search_results.size();
                 }
@@ -267,8 +268,8 @@ void GUI::render() {
                 ImGui::InputText("Data", data_path, IM_ARRAYSIZE(data_path));
                 if (ImGui::Button("Nacist data")) {
                     auto docs = IndexHandler::load_documents(data_path);
-                    auto tokenized_docs = IndexHandler::preprocess_documents(docs);
-                    auto indexer = Indexer(docs, tokenized_docs);
+                    auto [tokenized_docs, positions] = IndexHandler::preprocess_documents(docs);
+                    auto indexer = Indexer(docs, tokenized_docs, positions);
                     indexers[current_index] = indexer;
                     IndexHandler::save_index(indexer, "../index/" + indices[current_index] + ".json");
                 }

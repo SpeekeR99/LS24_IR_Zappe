@@ -219,6 +219,9 @@ std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &
     auto tokenized_doc = indexer.get_tokenized_doc(doc_id);
     auto words = tokenized_doc.content;
 
+    if (words.size() <= window_size) /* WTF? ID 278 has only 28 words */
+        window_size = words.size();
+
     std::tuple<int, int, int> best_window = std::make_tuple(0, window_size - 1, 0); // start, end, unique words count
 
     /* Positions = word -> (doc_id, positions) */
@@ -244,7 +247,7 @@ std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &
     }
 
     /* Which words in the window should be highlighted */
-    std::vector<int> highlight_indexes;
+    std::vector<int> highlight_indexes{};
     for (int i = std::get<0>(best_window); i <= std::get<1>(best_window); i++)
         if (positions.count(words[i]) > 0)
             highlight_indexes.push_back(i - std::get<0>(best_window));

@@ -63,7 +63,7 @@ private:
     int current_field = 0;
     int current_model = 0;
     int k_best = 3;
-    bool detect_language = true;
+    bool detect_language = false;
 
     char query[256] = "";
     std::string query_lang;

@@ -54,7 +54,7 @@ void GUI::init() {
 
     /* Print out some info about the graphics drivers */
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "GLEW version: " << glewGetString(GLEW_VERSION) << std::endl;
+    std::cout << "GLEW version: " << glewGetString(GLEW_VERSION) << std::endl << std::endl;
 
     /* Setup Platform/Renderer backends */
     ImGui_ImplGlfw_InitForOpenGL(this->window, true);
@@ -64,7 +64,16 @@ void GUI::init() {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     /* Load the font */
-    this->font = io.Fonts->AddFontFromFileTTF(font_path, font_size);
+    static const ImWchar ranges[] = {
+        0x0020, 0x00FF, /* Basic Latin + Latin Supplement */
+        0x0100, 0x017F, /* Latin Extended-A */
+        0x2000, 0x206F, /* General Punctuation */
+        0x3000, 0x303F, /* CJK Symbols and Punctuation */
+        0,
+    };
+    ImFontConfig config;
+    config.GlyphRanges = ranges;
+    this->font = io.Fonts->AddFontFromFileTTF(font_path, font_size, &config);
 
     /* GREEN */
     ImGuiStyle &style = ImGui::GetStyle();
@@ -102,7 +111,7 @@ void GUI::render() {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
         /* Set up the main GUI configuration window */
-        ImGui::Begin("Hlavni okno", nullptr,
+        ImGui::Begin("Hlavní okno", nullptr,
                      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
                      ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar);
@@ -119,8 +128,8 @@ void GUI::render() {
                     glfwSetWindowShouldClose(window, true);
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Nastaveni")) { /* Settings menu */
-                if (ImGui::MenuItem("Graficka nastaveni...")) {
+            if (ImGui::BeginMenu("Nastavení")) { /* Settings menu */
+                if (ImGui::MenuItem("Grafická nastavení...")) {
                     show_settings_window = true;
                 }
                 ImGui::EndMenu();
@@ -137,7 +146,7 @@ void GUI::render() {
         /* TabBar */
         if (ImGui::BeginTabBar("##TabBar")) {
             /* Search tab */
-            if (ImGui::BeginTabItem("Vyhledavac")) {
+            if (ImGui::BeginTabItem("Vyhledávač")) {
                 /* Set up the main GUI configuration window */
                 ImGui::Begin("Konfigurace", nullptr,
                              ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
@@ -158,39 +167,39 @@ void GUI::render() {
                     ImGui::EndCombo();
                 }
 
-                const char *field_names[] = {"Vse", "Nadpis", "Obsah"};
+                const char *field_names[] = {"Vše", "Nadpis", "Obsah"};
                 ImGui::ListBox("Hledat v", &current_field, field_names, IM_ARRAYSIZE(field_names));
 
-                const char *model_names[] = {"Vektorovy", "Booleovsky"};
+                const char *model_names[] = {"Vektorový", "Booleovský"};
                 ImGui::ListBox("Model", &current_model, model_names, IM_ARRAYSIZE(model_names));
 
                 if (current_model == 0) { /* Vector model */
-                    ImGui::InputInt("K nejlepsich", &k_best);
+                    ImGui::InputInt("K nejlepších", &k_best);
                     if (k_best < 1)
                         k_best = 1;
                 }
 
                 ImGui::Checkbox("Detekce jazyka\n(dotazu)", &detect_language);
 
-                if (ImGui::Checkbox("Hledadni v blizkosti\n(proximity search)", &proximity_search)) {
+                if (ImGui::Checkbox("Hledání v blízkosti\n(proximity search)", &proximity_search)) {
                     if (proximity_search && phrase_search)
                         phrase_search = false;
                 }
 
                 if (proximity_search) {
-                    ImGui::InputInt("Vzdalenost", &proximity);
+                    ImGui::InputInt("Vzdálenost", &proximity);
                     if (proximity < 1)
                         proximity = 1;
                 }
 
-                if (ImGui::Checkbox("Hledani fráze\n(phrase search)", &phrase_search)) {
+                if (ImGui::Checkbox("Hledání fráze\n(phrase search)", &phrase_search)) {
                     if (proximity_search && phrase_search)
                         proximity_search = false;
                 }
 
                 ImGui::End();
 
-                ImGui::Begin("Vyhledavani", nullptr,
+                ImGui::Begin("Vyhledávání", nullptr,
                              ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
                 /* Set up the main GUI window position, size and font size */
@@ -272,9 +281,9 @@ void GUI::render() {
                 }
 
                 if (detect_language)
-                    ImGui::Text("Detekovany jazyk: %s", query_lang.c_str());
+                    ImGui::Text("Detekovaný jazyk: %s", query_lang.c_str());
 
-                ImGui::Text("Celkem vysledku: %d", total_results);
+                ImGui::Text("Celkem výsledků: %d", total_results);
                 ImGui::SetNextItemOpen(true, ImGuiCond_Once);
                 if (ImGui::TreeNode("Výsledky")) {
                     for (auto i = 0; i < total_results; i++) {
@@ -287,7 +296,7 @@ void GUI::render() {
                             auto highlight_index = highlight_indices[i];
 
                             /* Iterate word by word to highlight the words */
-                            ImGui::Text("Uryvek: ...");
+                            ImGui::Text("Úryvek: ...");
                             ImGui::SameLine();
                             std::istringstream snippet_stream(snippet);
                             std::string word;
@@ -323,7 +332,7 @@ void GUI::render() {
                 ImGui::EndTabItem();
             }
             /* Indexer tab */
-            if (ImGui::BeginTabItem("Indexovani")) {
+            if (ImGui::BeginTabItem("Indexování")) {
                 /* Set up the Index window */
                 ImGui::Begin("Index", nullptr,
                              ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
@@ -333,7 +342,7 @@ void GUI::render() {
                 ImGui::SetWindowSize(ImVec2((float) window_width / 3, (float) window_height));
                 ImGui::SetWindowFontScale(font_scale);
 
-                if (ImGui::BeginCombo("Vybrany index", indices[current_index].c_str())) {
+                if (ImGui::BeginCombo("Vybraný index", indices[current_index].c_str())) {
                     for (int i = 0; i < indices.size(); i++) {
                         bool is_selected = (current_index == i);
                         if (ImGui::Selectable(indices[i].c_str(), is_selected))
@@ -354,8 +363,8 @@ void GUI::render() {
                 }
                 ImGui::PopStyleColor(3);
 
-                ImGui::InputText("Novy index", new_index_name, IM_ARRAYSIZE(new_index_name));
-                if (ImGui::Button("Vytvorit")) {
+                ImGui::InputText("Nový index", new_index_name, IM_ARRAYSIZE(new_index_name));
+                if (ImGui::Button("Vytvořit")) {
                     indices.emplace_back(new_index_name);
                     Indexer indexer = Indexer();
                     indexers.emplace_back(indexer);
@@ -363,7 +372,7 @@ void GUI::render() {
                 }
 
                 ImGui::InputText("Data", data_path, IM_ARRAYSIZE(data_path));
-                if (ImGui::Button("Nacist data")) {
+                if (ImGui::Button("Načíst data")) {
                     auto docs = IndexHandler::load_documents(data_path);
                     auto [tokenized_docs, positions] = IndexHandler::preprocess_documents(docs);
                     auto indexer = Indexer(docs, tokenized_docs, positions);
@@ -372,7 +381,7 @@ void GUI::render() {
                 }
 
                 ImGui::InputInt("ID", &current_doc_id);
-                if (ImGui::Button("Nacist dokument")) {
+                if (ImGui::Button("Načíst dokument")) {
                     std::vector<int> id_vec = {current_doc_id};
                     auto doc = IndexHandler::get_docs(indexers[current_index], id_vec)[0];
                     current_doc_title = doc.title;
@@ -392,7 +401,7 @@ void GUI::render() {
                 }
 
                 ImGui::InputText("URL", url, IM_ARRAYSIZE(url));
-                if (ImGui::Button("Stahnout dokument z URL")) {
+                if (ImGui::Button("Stáhnout dokument z URL")) {
                     IndexHandler::add_doc_url(indexers[current_index], url);
                     IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
                 }
@@ -415,7 +424,7 @@ void GUI::render() {
                 ImGui::InputTextMultiline("H3", &current_doc_h3, ImVec2(0, font_size * 4));
                 ImGui::InputTextMultiline("Obsah", &current_doc_content);
 
-                if (ImGui::Button("Vytvorit")) {
+                if (ImGui::Button("Vytvořit")) {
                     std::vector<std::string> toc;
                     std::istringstream toc_stream(current_doc_toc);
                     std::string toc_line;
@@ -511,14 +520,14 @@ void GUI::render() {
     {
         if (show_settings_window) {
             /* Create a window */
-            ImGui::Begin("Graficka nastaveni", &show_settings_window,
+            ImGui::Begin("Grafická nastavení", &show_settings_window,
                          ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
             /* Set the window size */
             ImGui::SetWindowSize(ImVec2(600, 400));
 
             /* Window settings section */
-            ImGui::SeparatorText("Nastaveni okna");
+            ImGui::SeparatorText("Nastavení okna");
 
             /* Set the size of the window and the position of the window */
             if (ImGui::Button("Nastav na 1280x720")) {
@@ -536,13 +545,13 @@ void GUI::render() {
             }
             ImGui::SameLine();
             if (!fullscreen) {
-                if (ImGui::Button("Rezim fullscreen")) {
+                if (ImGui::Button("Režim fullscreen")) {
                     window_width = mode->width;
                     window_height = mode->height;
                     fullscreen = true; // Set fullscreen to true
                 }
             } else {
-                if (ImGui::Button("Rezim okna")) {
+                if (ImGui::Button("Režim okna")) {
                     window_width = 1280;
                     window_height = 720;
                     glfwSetWindowMonitor(window, nullptr, 0, 0, window_width, window_height, 0);
@@ -562,7 +571,7 @@ void GUI::render() {
             /* Colors section */
             ImGui::SeparatorText("Barvy");
             static int style_idx = 2; // Overall style
-            if (ImGui::Combo("Styl", &style_idx, "Tmavy\0Svetly\0Klasika\0")) {
+            if (ImGui::Combo("Styl", &style_idx, "Tmavý\0Světlý\0Klasika\0")) {
                 switch (style_idx) {
                     case 0:
                         ImGui::StyleColorsDark();
@@ -594,9 +603,9 @@ void GUI::render() {
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
                          ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse);
             ImGui::SetWindowFontScale(font_scale); // Set the font size
-            ImGui::Text("Aplikace byla vytvorena autorem:\nDominik Zappe");
+            ImGui::Text("Aplikace byla vytvořena autorem:\nDominik Zappe");
             ImGui::Separator();
-            ImGui::Text("Aplikace slouzi jako semestralni prace na predmet IR");
+            ImGui::Text("Aplikace slouží jako semestrální práce na předmet IR");
             ImGui::End();
         }
     }

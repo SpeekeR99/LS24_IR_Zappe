@@ -43,11 +43,6 @@ private:
     std::map<std::string, std::map<int, std::vector<int>>> positions_map;
 
     /**
-     * Adds words from the collection to the keywords
-     */
-    void docs_to_keywords();
-
-    /**
      * Index the given collection of documents
      */
     void index_everything();
@@ -67,6 +62,11 @@ public:
      * @param positions_map Map of word -> (doc_id, positions)
      */
     Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection, std::map<std::string, std::map<int, std::vector<int>>> &positions_map);
+
+    /**
+     * Adds words from the collection to the keywords
+     */
+    void docs_to_keywords();
 
     /**
      * Add documents to the collection
@@ -153,4 +153,9 @@ public:
      * @return Size of the title index
      */
     [[nodiscard]] int get_title_index_size() const;
+    /**
+     * Get the keywords
+     * @return keywords
+     */
+    [[nodiscard]] std::unordered_set<std::string> get_keywords() const;
 };

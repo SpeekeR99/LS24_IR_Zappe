@@ -193,6 +193,8 @@ std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<
 
     /* Return top k results */
     std::tuple<std::vector<int>, std::vector<float>, std::vector<int>> top_k;
+    if (k > results.size())
+        k = static_cast<int>(results.size());
     for (int i = 0; i < k; i++) {
         std::get<0>(top_k).emplace_back(results[i].first);
         std::get<1>(top_k).emplace_back(results[i].second);
@@ -382,4 +384,8 @@ int Indexer::get_index_size() const {
 
 int Indexer::get_title_index_size() const {
     return static_cast<int>(this->title_index.size());
+}
+
+std::unordered_set<std::string> Indexer::get_keywords() const {
+    return this->keywords;
 }

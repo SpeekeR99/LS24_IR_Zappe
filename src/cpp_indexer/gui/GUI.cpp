@@ -50,7 +50,7 @@ void GUI::init() {
     (void) io;
 
     /* Setup Dear ImGui style */
-    ImGui::StyleColorsDark();
+    ImGui::StyleColorsClassic();
 
     /* Print out some info about the graphics drivers */
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
@@ -65,6 +65,11 @@ void GUI::init() {
 
     /* Load the font */
     this->font = io.Fonts->AddFontFromFileTTF(font_path, font_size);
+
+    /* GREEN */
+    ImGuiStyle &style = ImGui::GetStyle();
+    for (auto &col : style.Colors)
+        col = ImVec4(col.x - 0.04f, col.z + 0.05f, col.y - 0.08f, col.w);
 
     /* Initialize the index */
     for (const auto &entry : std::filesystem::directory_iterator("../index")) {
@@ -179,22 +184,26 @@ void GUI::render() {
 
                 ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 80, ImGui::GetCursorPosY() + 20));
 
-                ImGui::InputText("##Dotaz", query, IM_ARRAYSIZE(query));
+                bool find = false;
+                if (ImGui::InputText("##Dotaz", &query, ImGuiInputTextFlags_EnterReturnsTrue))
+                    find = true;
                 ImGui::SameLine();
-                if (ImGui::Button("Hledej")) {
+                if (ImGui::Button("Hledej") || find) {
                     if (detect_language)
                         query_lang = PyHandler::detect_lang_text(query);
 
                     auto index = indexers[current_index];
-                    std::string query_str = query;
                     FieldType field = FieldType::ALL;
                     if (current_field == 1)
                         field = FieldType::TITLE;
                     else if (current_field == 2)
                         field = FieldType::CONTENT;
 
+                    result_snippets.clear();
+                    highlight_indices.clear();
+
                     if (current_model == 0) { /* Vector model */
-                        auto [result, scores, positions] = IndexHandler::search(index, query_str, k_best, field);
+                        auto [result, scores, positions] = IndexHandler::search(index, query, k_best, field);
                         this->search_results = result;
                         for (const auto &doc : search_results) {
                             auto [snippet, highlight_index] = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size);
@@ -202,7 +211,7 @@ void GUI::render() {
                             highlight_indices.emplace_back(highlight_index);
                         }
                     } else { /* Boolean model */
-                        auto [result, positions] = IndexHandler::search(index, query_str, field);
+                        auto [result, positions] = IndexHandler::search(index, query, field);
                         this->search_results = result;
                         for (const auto &doc : search_results) {
                             auto [snippet, highlight_index] = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size);
@@ -211,6 +220,31 @@ void GUI::render() {
                         }
                     }
                     this->total_results = this->search_results.size();
+                }
+
+                static auto autocomplete_entries = indexers[current_index].get_keywords();
+
+                if (!query.empty()) {
+                    std::istringstream iss(query);
+                    std::vector<std::string> words((std::istream_iterator<std::string>(iss)),
+                                                   std::istream_iterator<std::string>());
+                    std::string lastWord = words.back();
+
+                    if (ImGui::BeginChild("##ScrollingRegion", ImVec2(0, 100), true)) {
+                        for (const auto &autocompleteEntry: autocomplete_entries) {
+                            /* Check if the last word is a prefix of the autocomplete entry */
+                            if (autocompleteEntry.compare(0, lastWord.size(), lastWord) == 0) {
+                                if (ImGui::Selectable(autocompleteEntry.c_str())) {
+                                    words.pop_back();
+                                    words.push_back(autocompleteEntry);
+                                    query = "";
+                                    for (const auto &word: words)
+                                        query += word + " ";
+                                }
+                            }
+                        }
+                    }
+                    ImGui::EndChild();
                 }
 
                 if (detect_language)
@@ -229,7 +263,7 @@ void GUI::render() {
                             auto highlight_index = highlight_indices[i];
 
                             /* Iterate word by word to highlight the words */
-                            ImGui::Text("Úryvek: ...");
+                            ImGui::Text("Uryvek: ...");
                             ImGui::SameLine();
                             std::istringstream snippet_stream(snippet);
                             std::string word;
@@ -503,7 +537,7 @@ void GUI::render() {
 
             /* Colors section */
             ImGui::SeparatorText("Barvy");
-            static int style_idx = 0; // Overall style
+            static int style_idx = 2; // Overall style
             if (ImGui::Combo("Styl", &style_idx, "Tmavy\0Svetly\0Klasika\0")) {
                 switch (style_idx) {
                     case 0:
@@ -518,6 +552,10 @@ void GUI::render() {
                     default:
                         break;
                 }
+                /* GREEN */
+                ImGuiStyle &style = ImGui::GetStyle();
+                for (auto &col : style.Colors)
+                    col = ImVec4(col.x - 0.04f, col.z + 0.05f, col.y - 0.08f, col.w);
             }
             ImGui::End();
         }

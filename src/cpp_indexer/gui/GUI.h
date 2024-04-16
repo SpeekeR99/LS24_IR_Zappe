@@ -65,7 +65,7 @@ private:
     int k_best = 3;
     bool detect_language = false;
 
-    char query[256] = "";
+    std::string query;
     std::string query_lang;
 
     char new_index_name[256] = "";

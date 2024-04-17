@@ -218,10 +218,15 @@ std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &
     auto doc = indexer.get_doc(doc_id);
     auto content = doc.content;
     auto tokenized_doc = indexer.get_tokenized_doc(doc_id);
-    auto words = tokenized_doc.content;
+    auto words_tok = tokenized_doc.content;
 
-    if (words.size() <= window_size) /* WTF? ID 278 has only 28 words */
-        window_size = words.size();
+    std::vector<std::string> words_orig;
+    std::istringstream iss(content);
+    for (std::string s; iss >> s; )
+        words_orig.push_back(s);
+
+    if (words_tok.size() <= window_size) /* WTF? ID 278 has only 28 words */
+        window_size = words_tok.size();
 
     std::tuple<int, int, int> best_window = std::make_tuple(0, window_size - 1, 0); // start, end, unique words count
 
@@ -233,13 +238,13 @@ std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &
             for (const auto &pos : positions_) {
                 /* Find the window around the position */
                 int start = std::max(0, pos - window_size / 2);
-                int end = std::min((int)words.size() - 1, start + window_size - 1);
+                int end = std::min((int)words_tok.size() - 1, start + window_size - 1);
                 start = std::max(0, end - window_size + 1);
 
                 std::set<std::string> unique_words_in_window;
                 for (int i = start; i <= end; i++)
-                    if (positions.count(words[i]) > 0)
-                        unique_words_in_window.insert(words[i]);
+                    if (i < words_tok.size() && positions.count(words_tok[i]) > 0)
+                        unique_words_in_window.insert(words_tok[i]);
 
                 if (unique_words_in_window.size() > std::get<2>(best_window))
                     best_window = std::make_tuple(start, end, unique_words_in_window.size());
@@ -250,17 +255,13 @@ std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &
     /* Which words in the window should be highlighted */
     std::vector<int> highlight_indexes{};
     for (int i = std::get<0>(best_window); i <= std::get<1>(best_window); i++)
-        if (positions.count(words[i]) > 0)
+        if (i < words_tok.size() && positions.count(words_tok[i]) > 0)
             highlight_indexes.push_back(i - std::get<0>(best_window));
-
-    std::vector<std::string> words_vec;
-    std::istringstream iss(content);
-    for (std::string s; iss >> s; )
-        words_vec.push_back(s);
 
     std::string snippet;
     for (int i = std::get<0>(best_window); i <= std::get<1>(best_window); i++)
-        snippet += words_vec[i] + " ";
+        if (i < words_orig.size())
+            snippet += words_orig[i] + " ";
 
     return {snippet, highlight_indexes};
 }

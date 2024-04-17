@@ -181,20 +181,22 @@ void GUI::render() {
 
                 ImGui::Checkbox("Detekce jazyka\n(dotazu)", &detect_language);
 
-                if (ImGui::Checkbox("Hledání v blízkosti\n(proximity search)", &proximity_search)) {
-                    if (proximity_search && phrase_search)
-                        phrase_search = false;
-                }
+                if (current_model == 0) {/* Vector model */
+                    if (ImGui::Checkbox("Hledání v blízkosti\n(proximity search)", &proximity_search)) {
+                        if (proximity_search && phrase_search)
+                            phrase_search = false;
+                    }
 
-                if (proximity_search) {
-                    ImGui::InputInt("Vzdálenost", &proximity);
-                    if (proximity < 1)
-                        proximity = 1;
-                }
+                    if (proximity_search) {
+                        ImGui::InputInt("Vzdálenost", &proximity);
+                        if (proximity < 1)
+                            proximity = 1;
+                    }
 
-                if (ImGui::Checkbox("Hledání fráze\n(phrase search)", &phrase_search)) {
-                    if (proximity_search && phrase_search)
-                        proximity_search = false;
+                    if (ImGui::Checkbox("Hledání fráze\n(phrase search)", &phrase_search)) {
+                        if (proximity_search && phrase_search)
+                            proximity_search = false;
+                    }
                 }
 
                 ImGui::End();
@@ -210,7 +212,7 @@ void GUI::render() {
                 ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 80, ImGui::GetCursorPosY() + 20));
 
                 bool find = false;
-                if (ImGui::InputText("##Dotaz", &query, ImGuiInputTextFlags_EnterReturnsTrue))
+                if (ImGui::InputTextWithHint("##Dotaz", "Zadejte svůj dotaz...", &query, ImGuiInputTextFlags_EnterReturnsTrue))
                     find = true;
                 ImGui::SameLine();
                 if (ImGui::Button("Hledej") || find) {
@@ -363,7 +365,7 @@ void GUI::render() {
                 }
                 ImGui::PopStyleColor(3);
 
-                ImGui::InputText("Nový index", new_index_name, IM_ARRAYSIZE(new_index_name));
+                ImGui::InputTextWithHint("Nový index", "Zadejte název indexu...", new_index_name, IM_ARRAYSIZE(new_index_name));
                 if (ImGui::Button("Vytvořit")) {
                     indices.emplace_back(new_index_name);
                     Indexer indexer = Indexer();
@@ -371,7 +373,7 @@ void GUI::render() {
                     current_index = indices.size() - 1;
                 }
 
-                ImGui::InputText("Data", data_path, IM_ARRAYSIZE(data_path));
+                ImGui::InputTextWithHint("Data", "Zadejte cestu k datům...", data_path, IM_ARRAYSIZE(data_path));
                 if (ImGui::Button("Načíst data")) {
                     auto docs = IndexHandler::load_documents(data_path);
                     auto [tokenized_docs, positions] = IndexHandler::preprocess_documents(docs);
@@ -400,7 +402,7 @@ void GUI::render() {
                     current_doc_content = doc.content;
                 }
 
-                ImGui::InputText("URL", url, IM_ARRAYSIZE(url));
+                ImGui::InputTextWithHint("URL", "Zadejte url z witcher.fandom.com/cs", url, IM_ARRAYSIZE(url));
                 if (ImGui::Button("Stáhnout dokument z URL")) {
                     IndexHandler::add_doc_url(indexers[current_index], url);
                     IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");

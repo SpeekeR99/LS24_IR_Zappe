@@ -86,3 +86,34 @@ std::map<std::string, map_element> TF_IDF::calc_tf_idf(const std::vector<Tokeniz
 
     return map_ele;
 }
+
+void TF_IDF::calc_tf_idf_file_based(const std::string &index_path_dir, bool title) {
+    std::map<int, std::map<std::string, float>> tf_idf_docs;
+    {
+        std::map<std::string, float> idf;
+        {
+            auto docs = FileBasedLoader::load_tokenized_docs(index_path_dir);
+
+            idf = calc_idf(docs);
+
+            for (const auto &doc: docs) {
+                auto words = doc.content;
+                words.insert(words.end(), doc.toc.begin(), doc.toc.end());
+                words.insert(words.end(), doc.h1.begin(), doc.h1.end());
+                words.insert(words.end(), doc.h2.begin(), doc.h2.end());
+                words.insert(words.end(), doc.h3.begin(), doc.h3.end());
+                if (title)
+                    words = doc.title;
+                auto tf = calc_tf(words);
+                std::map<std::string, float> tf_idf_temp;
+                for (auto &[word, value]: tf)
+                    tf_idf_temp[word] = value * idf[word];
+                tf_idf_docs[doc.id] = std::move(tf_idf_temp);
+            }
+        }
+
+        FileBasedLoader::save_tf_idf(tf_idf_docs, idf, index_path_dir, title);
+    }
+
+    FileBasedLoader::save_tf_idf_norms(tf_idf_docs, index_path_dir, title);
+}

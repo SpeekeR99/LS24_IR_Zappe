@@ -4,7 +4,9 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <fstream>
 #include "Document.h"
+#include "FileBasedLoader.h"
 
 /**
  * Map element used in calc_tf_idf
@@ -66,4 +68,10 @@ public:
      * @return Map of words and their IDF values
      */
     static std::map<std::string, map_element> calc_tf_idf(const std::vector<TokenizedDocument> &collection, std::map<int, float> &norms, bool title = false);
+    /**
+     * Calculate TF-IDF (file based)
+     * @param index_path_dir Path to the directory with the index
+     * @param title Whether to calculate TF-IDF for titles
+     */
+     static void calc_tf_idf_file_based(const std::string &index_path_dir, bool title = false);
 };

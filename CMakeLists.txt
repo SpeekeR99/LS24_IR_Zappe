@@ -110,6 +110,8 @@ add_executable(
     src/cpp_indexer/index/TF_IDF.cpp
     src/cpp_indexer/index/Indexer.h
     src/cpp_indexer/index/Indexer.cpp
+    src/cpp_indexer/data/FileBasedLoader.h
+    src/cpp_indexer/data/FileBasedLoader.cpp
     src/PyHandler.h
     src/PyHandler.cpp
     src/cpp_indexer/gui/GUI.h
@@ -136,6 +138,8 @@ add_executable(
     src/cpp_indexer/data/DataLoader.cpp
     src/cpp_indexer/index/TF_IDF.h
     src/cpp_indexer/index/TF_IDF.cpp
+    src/cpp_indexer/data/FileBasedLoader.h
+    src/cpp_indexer/data/FileBasedLoader.cpp
     src/PyHandler.h
     src/PyHandler.cpp
     ${lemma_lib_src}

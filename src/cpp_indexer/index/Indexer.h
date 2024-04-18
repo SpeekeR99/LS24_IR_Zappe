@@ -41,11 +41,17 @@ private:
     std::map<int, float> title_norms;
     /** Map of word -> (doc_id, positions) */
     std::map<std::string, std::map<int, std::vector<int>>> positions_map;
+    /** Path to the directory with the index (if file based) */
+    std::string index_path_dir;
 
     /**
      * Index the given collection of documents
      */
     void index_everything();
+    /**
+     * Index the given collection of documents (file based)
+     */
+    void index_everything_file_based();
 
 public:
     /** Document cache */
@@ -55,6 +61,11 @@ public:
      * Constructor for the Indexer class
      */
     Indexer();
+    /**
+     * Constructor for file based Indexer
+     * @param index_path_dir Path to the directory with the index
+     */
+    explicit Indexer(const std::string &index_path_dir);
     /**
      * Constructor for the Indexer class
      * @param original_collection Original collection of documents

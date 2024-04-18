@@ -155,7 +155,8 @@ std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Pre
 
         /* If token contains   (non-breaking space), split it into two tokens */
         if (token.find(" ") != std::string::npos) {
-            token = std::regex_replace(token, std::regex(" "), " ");
+            while (token.find(" ") != std::string::npos)
+                token = std::regex_replace(token, std::regex(" "), " ");
 
             std::istringstream iss(token);
             std::string new_token;

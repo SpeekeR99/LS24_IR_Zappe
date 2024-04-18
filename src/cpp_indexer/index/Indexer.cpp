@@ -6,6 +6,11 @@ Indexer::Indexer() : collection(std::vector<TokenizedDocument>()), keywords(), d
     /* Nothing to do here :) */
 }
 
+Indexer::Indexer(const string &index_path_dir) : collection(std::vector<TokenizedDocument>()), keywords(), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()), positions_map() {
+    this->index_path_dir = index_path_dir;
+    this->index_everything_file_based();
+}
+
 Indexer::Indexer(const std::vector<Document> &original_collection, const std::vector<TokenizedDocument> &tokenized_collection, std::map<std::string, std::map<int, std::vector<int>>> &positions_map) : collection(std::vector<TokenizedDocument>()), keywords(), doc_cache(), index(std::map<std::string, map_element>()), norms(std::map<int, float>()), positions_map() {
     this->add_docs(original_collection, tokenized_collection, positions_map);
 }
@@ -56,6 +61,17 @@ void Indexer::index_everything() {
     auto t_end = std::chrono::high_resolution_clock::now();
     std::cout << "Indexed " << this->get_collection_size() << " documents and " << this->get_index_size() << " words using TF-IDF" << std::endl;
     std::cout << "(Indexed " << this->get_title_index_size() << " words in titles using TF-IDF)" << std::endl;
+    std::cout << "Indexing done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
+}
+
+void Indexer::index_everything_file_based() {
+    std::cout << "Indexing documents..." << std::endl;
+    auto t_start = std::chrono::high_resolution_clock::now();
+
+    TF_IDF::calc_tf_idf_file_based(this->index_path_dir);
+    TF_IDF::calc_tf_idf_file_based(this->index_path_dir, true);
+
+    auto t_end = std::chrono::high_resolution_clock::now();
     std::cout << "Indexing done in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
 }
 

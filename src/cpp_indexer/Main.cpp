@@ -1,4 +1,5 @@
 #include "GUI.h"
+#include "FileBasedLoader.h"
 
 /**
  * Main function
@@ -8,56 +9,32 @@ int main() {
 //    GUI gui = GUI();
 //    gui.run();
 
+    std::string base_dir = "../index/index1/";
+    if (!std::filesystem::exists(base_dir))
+        std::filesystem::create_directory(base_dir);
+
     /* Load documents */
     {
         auto docs = IndexHandler::load_documents("../data");
-        std::ofstream output("../index/index1_doc_cache.json");
-        json j;
-        for (const auto &doc : docs)
-            j[std::to_string(doc.id)] = doc.to_json();
-        output << j.dump(1);
-        output.close();
+        FileBasedLoader::save_doc_cache(docs, base_dir);
     }
 
     /* Preprocess documents */
     {
-        std::ifstream input("../index/index1_doc_cache.json");
-        json j;
-        input >> j;
-        input.close();
         std::vector<Document> docs;
-        for (const auto &item : j.items()) {
-            Document temp = Document();
-            temp.from_json(item.value());
-            docs.push_back(temp);
+        {
+            auto doc_cache = FileBasedLoader::load_doc_cache(base_dir);
+            for (const auto &[id, doc]: doc_cache)
+                docs.push_back(doc);
         }
-
         auto [tokenized_docs, positions_map] = IndexHandler::preprocess_documents(docs);
-
-        std::ofstream output("../index/index1_tokenized_docs.json");
-        json j2;
-        for (const auto &doc : tokenized_docs)
-            j2[std::to_string(doc.id)] = doc.to_json();
-        output << j2.dump(1);
-        output.close();
-
-        output.open("../index/index1_positions_map.json");
-        json j3;
-        for (const auto &item : positions_map) {
-            j3[item.first] = json::object();
-            for (const auto &item2 : item.second) {
-                j3[item.first][std::to_string(item2.first)] = json::array();
-                for (const auto &pos : item2.second)
-                    j3[item.first][std::to_string(item2.first)].push_back(pos);
-            }
-        }
-        output << j3.dump(1);
-        output.close();
+        FileBasedLoader::save_tokenized_docs(tokenized_docs, base_dir);
+        FileBasedLoader::save_positions_map(positions_map, base_dir);
     }
 
-//    /* Index documents */
-//    auto indexer = Indexer(docs, tokenized_docs, positions_map);
-//
+    /* Index documents */
+    auto indexer = Indexer(base_dir);
+
 //    /* Save the index */
 //    IndexHandler::save_index(indexer, "../index/index1.json");
 //

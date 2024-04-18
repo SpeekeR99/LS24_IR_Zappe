@@ -9,6 +9,7 @@ include_directories(src/cpp_indexer)
 include_directories(src/cpp_indexer/data)
 include_directories(src/cpp_indexer/index)
 include_directories(src/cpp_indexer/gui)
+include_directories(src/cpp_indexer/eval)
 
 # - - - - - IR - - - - -
 
@@ -96,7 +97,7 @@ set(
 )
 
 add_executable(
-    cpp_tf_idf
+    cpp_indexer
     src/cpp_indexer/Main.cpp
     src/cpp_indexer/index/IndexHandler.h
     src/cpp_indexer/index/IndexHandler.cpp
@@ -119,11 +120,38 @@ add_executable(
     ${imgui_impl_files}
 )
 
+add_executable(
+    cpp_indexer_eval
+    src/cpp_indexer/eval/Main.cpp
+    src/cpp_indexer/data/Document.h
+    src/cpp_indexer/eval/DataUtils.h
+    src/cpp_indexer/eval/DataUtils.cpp
+    src/cpp_indexer/index/IndexHandler.h
+    src/cpp_indexer/index/IndexHandler.cpp
+    src/cpp_indexer/index/Indexer.h
+    src/cpp_indexer/index/Indexer.cpp
+    src/cpp_indexer/data/Preprocessor.h
+    src/cpp_indexer/data/Preprocessor.cpp
+    src/cpp_indexer/data/DataLoader.h
+    src/cpp_indexer/data/DataLoader.cpp
+    src/cpp_indexer/index/TF_IDF.h
+    src/cpp_indexer/index/TF_IDF.cpp
+    src/PyHandler.h
+    src/PyHandler.cpp
+    ${lemma_lib_src}
+    ${stem_lib_src}
+)
+
 target_link_libraries(
-    cpp_tf_idf PRIVATE
+    cpp_indexer PRIVATE
         nlohmann_json::nlohmann_json
         glfw libglew_static
         ${GLFW_LIBRARIES}
         ${GLEW_LIBRARIES}
         ${OPENGL_LIBRARY}
+)
+
+target_link_libraries(
+    cpp_indexer_eval PRIVATE
+        nlohmann_json::nlohmann_json
 )

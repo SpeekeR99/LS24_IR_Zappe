@@ -153,6 +153,20 @@ std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Pre
         if (token.empty())
             continue;
 
+        /* If token contains   (non-breaking space), split it into two tokens */
+        if (token.find(" ") != std::string::npos) {
+            token = std::regex_replace(token, std::regex(" "), " ");
+
+            std::istringstream iss(token);
+            std::string new_token;
+            while (iss >> new_token) {
+                tokens.push_back(new_token);
+                token_positions[new_token].push_back(static_cast<int>(tokens.size() - 1));
+            }
+
+            continue;
+        }
+
         /* If token is a combination of letters and numbers, split them into more tokens e.g.: 1a2b -> 1 a 2 b */
         if (std::any_of(token.begin(), token.end(), [](char c) { return std::isdigit(c); }) &&
             std::any_of(token.begin(), token.end(), [](char c) { return std::isalpha(c); })) {

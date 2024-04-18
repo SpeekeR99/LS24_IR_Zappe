@@ -5,15 +5,56 @@
  * @return Exit code
  */
 int main() {
-    GUI gui = GUI();
-    gui.run();
-//
-//    /* Load documents */
-//    auto docs = IndexHandler::load_documents("../data");
-//
-//    /* Preprocess documents */
-//    auto [tokenized_docs, positions_map] = IndexHandler::preprocess_documents(docs);
-//
+//    GUI gui = GUI();
+//    gui.run();
+
+    /* Load documents */
+    {
+        auto docs = IndexHandler::load_documents("../data");
+        std::ofstream output("../index/index1_doc_cache.json");
+        json j;
+        for (const auto &doc : docs)
+            j[std::to_string(doc.id)] = doc.to_json();
+        output << j.dump(1);
+        output.close();
+    }
+
+    /* Preprocess documents */
+    {
+        std::ifstream input("../index/index1_doc_cache.json");
+        json j;
+        input >> j;
+        input.close();
+        std::vector<Document> docs;
+        for (const auto &item : j.items()) {
+            Document temp = Document();
+            temp.from_json(item.value());
+            docs.push_back(temp);
+        }
+
+        auto [tokenized_docs, positions_map] = IndexHandler::preprocess_documents(docs);
+
+        std::ofstream output("../index/index1_tokenized_docs.json");
+        json j2;
+        for (const auto &doc : tokenized_docs)
+            j2[std::to_string(doc.id)] = doc.to_json();
+        output << j2.dump(1);
+        output.close();
+
+        output.open("../index/index1_positions_map.json");
+        json j3;
+        for (const auto &item : positions_map) {
+            j3[item.first] = json::object();
+            for (const auto &item2 : item.second) {
+                j3[item.first][std::to_string(item2.first)] = json::array();
+                for (const auto &pos : item2.second)
+                    j3[item.first][std::to_string(item2.first)].push_back(pos);
+            }
+        }
+        output << j3.dump(1);
+        output.close();
+    }
+
 //    /* Index documents */
 //    auto indexer = Indexer(docs, tokenized_docs, positions_map);
 //

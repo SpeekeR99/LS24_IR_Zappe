@@ -4,6 +4,7 @@
 #include "Preprocessor.h"
 #include "Indexer.h"
 #include "PyHandler.h"
+#include "Const.h"
 
 class IndexHandler {
 public:

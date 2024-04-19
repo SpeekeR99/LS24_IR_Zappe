@@ -81,11 +81,23 @@ void GUI::init() {
         col = ImVec4(col.x - 0.04f, col.z + 0.05f, col.y - 0.08f, col.w);
 
     /* Initialize the index */
-    for (const auto &entry : std::filesystem::directory_iterator("../index")) {
-        indices.emplace_back(entry.path().filename().replace_extension().string());
-        Indexer indexer = Indexer();
-        IndexHandler::load_index(indexer, entry.path().string());
-        indexers.emplace_back(indexer);
+    if (FILE_BASED) {
+        if (!std::filesystem::exists(FILE_BASED_INDEX_PATH))
+            std::filesystem::create_directory(FILE_BASED_INDEX_PATH);
+        for (const auto &entry : std::filesystem::directory_iterator(FILE_BASED_INDEX_PATH)) {
+            indices.emplace_back(entry.path().filename().replace_extension().string());
+            Indexer indexer = Indexer(entry.path().string() + "/");
+            indexers.emplace_back(indexer);
+        }
+    } else {
+        if (!std::filesystem::exists(INDEX_PATH))
+            std::filesystem::create_directory(INDEX_PATH);
+        for (const auto &entry : std::filesystem::directory_iterator(INDEX_PATH)) {
+            indices.emplace_back(entry.path().filename().replace_extension().string());
+            Indexer indexer = Indexer();
+            IndexHandler::load_index(indexer, entry.path().string());
+            indexers.emplace_back(indexer);
+        }
     }
 }
 
@@ -263,15 +275,18 @@ void GUI::render() {
                     std::istringstream iss(query);
                     std::vector<std::string> words((std::istream_iterator<std::string>(iss)),
                                                    std::istream_iterator<std::string>());
-                    std::string lastWord = words.back();
+                    std::string last_word = words.back();
 
                     if (ImGui::BeginChild("##ScrollingRegion", ImVec2(0, 100), true)) {
-                        for (const auto &autocompleteEntry: autocomplete_entries) {
+                        for (const auto &autocomplete_entry: autocomplete_entries) {
                             /* Check if the last word is a prefix of the autocomplete entry */
-                            if (autocompleteEntry.compare(0, lastWord.size(), lastWord) == 0) {
-                                if (ImGui::Selectable(autocompleteEntry.c_str())) {
+                            /* ignore case */
+                            std::string last_word_lower = last_word;
+                            std::transform(last_word_lower.begin(), last_word_lower.end(), last_word_lower.begin(), ::tolower);
+                            if (autocomplete_entry.compare(0, last_word_lower.size(), last_word_lower) == 0) {
+                                if (ImGui::Selectable(autocomplete_entry.c_str())) {
                                     words.pop_back();
-                                    words.push_back(autocompleteEntry);
+                                    words.push_back(autocomplete_entry);
                                     query = "";
                                     for (const auto &word: words)
                                         query += word + " ";
@@ -304,6 +319,7 @@ void GUI::render() {
                             std::string word;
                             int index = 0;
                             int size_so_far = 0;
+                            int threshold = ImGui::GetCurrentWindow()->Size.x - 400;
                             while (std::getline(snippet_stream, word, ' ')) {
                                 auto size = ImGui::CalcTextSize(word.c_str());
                                 if (std::find(highlight_index.begin(), highlight_index.end(), index++) != highlight_index.end()) {
@@ -314,7 +330,6 @@ void GUI::render() {
                                 }
                                 ImGui::Text("%s", word.c_str());
                                 size_so_far += size.x;
-                                int threshold = ImGui::GetCurrentWindow()->Size.x - 400;
                                 if (size_so_far < threshold)
                                     ImGui::SameLine();
                                 else
@@ -358,7 +373,10 @@ void GUI::render() {
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
                 if (ImGui::Button("Smazat")) {
-                    std::filesystem::remove("../index/" + indices[current_index] + ".json");
+                    if (FILE_BASED)
+                        std::filesystem::remove_all(FILE_BASED_INDEX_PATH + indices[current_index]);
+                    else
+                        std::filesystem::remove(INDEX_PATH + indices[current_index] + ".json");
                     indices.erase(indices.begin() + current_index);
                     indexers.erase(indexers.begin() + current_index);
                     current_index = 0;
@@ -368,8 +386,14 @@ void GUI::render() {
                 ImGui::InputTextWithHint("Nový index", "Zadejte název indexu...", new_index_name, IM_ARRAYSIZE(new_index_name));
                 if (ImGui::Button("Vytvořit")) {
                     indices.emplace_back(new_index_name);
-                    Indexer indexer = Indexer();
-                    indexers.emplace_back(indexer);
+                    if (FILE_BASED) {
+                        std::filesystem::create_directory(FILE_BASED_INDEX_PATH + new_index_name);
+                        Indexer indexer = Indexer(FILE_BASED_INDEX_PATH + new_index_name + "/", false);
+                        indexers.emplace_back(indexer);
+                    } else {
+                        Indexer indexer = Indexer();
+                        indexers.emplace_back(indexer);
+                    }
                     current_index = indices.size() - 1;
                 }
 
@@ -377,9 +401,17 @@ void GUI::render() {
                 if (ImGui::Button("Načíst data")) {
                     auto docs = IndexHandler::load_documents(data_path);
                     auto [tokenized_docs, positions] = IndexHandler::preprocess_documents(docs);
-                    auto indexer = Indexer(docs, tokenized_docs, positions);
-                    indexers[current_index] = indexer;
-                    IndexHandler::save_index(indexer, "../index/" + indices[current_index] + ".json");
+                    if (FILE_BASED) {
+                        FileBasedLoader::save_doc_cache(docs, FILE_BASED_INDEX_PATH + indices[current_index] + "/");
+                        FileBasedLoader::save_tokenized_docs(tokenized_docs, FILE_BASED_INDEX_PATH + indices[current_index] + "/");
+                        FileBasedLoader::save_positions_map(positions, FILE_BASED_INDEX_PATH + indices[current_index] + "/");
+                        auto indexer = Indexer(FILE_BASED_INDEX_PATH + indices[current_index] + "/");
+                        indexers[current_index] = indexer;
+                    } else {
+                        auto indexer = Indexer(docs, tokenized_docs, positions);
+                        indexers[current_index] = indexer;
+                        IndexHandler::save_index(indexer, "../index/" + indices[current_index] + ".json");
+                    }
                 }
 
                 ImGui::InputInt("ID", &current_doc_id);
@@ -405,7 +437,8 @@ void GUI::render() {
                 ImGui::InputTextWithHint("URL", "Zadejte url z witcher.fandom.com/cs", url, IM_ARRAYSIZE(url));
                 if (ImGui::Button("Stáhnout dokument z URL")) {
                     IndexHandler::add_doc_url(indexers[current_index], url);
-                    IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
+                    if (!FILE_BASED)
+                        IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
                 }
 
                 ImGui::End();
@@ -458,7 +491,8 @@ void GUI::render() {
                     std::vector<Document> doc_vec = {doc};
 
                     IndexHandler::add_docs(indexers[current_index], doc_vec);
-                    IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
+                    if (!FILE_BASED)
+                        IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("Aktualizovat")) {
@@ -491,7 +525,8 @@ void GUI::render() {
                     std::vector<Document> doc_vec = {doc};
 
                     IndexHandler::update_docs(indexers[current_index], id_vec, doc_vec);
-                    IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
+                    if (!FILE_BASED)
+                        IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
                 }
                 ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
@@ -500,7 +535,8 @@ void GUI::render() {
                 if (ImGui::Button("Smazat")) {
                     std::vector<int> id_vec = {current_doc_id};
                     IndexHandler::remove_docs(indexers[current_index], id_vec);
-                    IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
+                    if (!FILE_BASED)
+                        IndexHandler::save_index(indexers[current_index], "../index/" + indices[current_index] + ".json");
                 }
                 ImGui::PopStyleColor(3);
 

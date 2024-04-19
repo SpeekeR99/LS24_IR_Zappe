@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 project(cpp_tf_idf)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ --static")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ --static -m64")
 
 include_directories(src)
 include_directories(src/cpp_indexer)
@@ -99,6 +99,7 @@ set(
 add_executable(
     cpp_indexer
     src/cpp_indexer/Main.cpp
+    src/cpp_indexer/Const.h
     src/cpp_indexer/index/IndexHandler.h
     src/cpp_indexer/index/IndexHandler.cpp
     src/cpp_indexer/data/Document.h
@@ -125,6 +126,7 @@ add_executable(
 add_executable(
     cpp_indexer_eval
     src/cpp_indexer/eval/Main.cpp
+    src/cpp_indexer/Const.h
     src/cpp_indexer/data/Document.h
     src/cpp_indexer/eval/DataUtils.h
     src/cpp_indexer/eval/DataUtils.cpp

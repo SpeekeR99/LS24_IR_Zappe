@@ -7,11 +7,9 @@
 #include "TF_IDF.h"
 #include "Preprocessor.h"
 #include "PyHandler.h"
+#include "Const.h"
 
 using json = nlohmann::json;
-
-/** Language detection is really slow */
-constexpr bool DETECT_LANG = false;
 
 /**
  * Enum for the field type
@@ -64,8 +62,9 @@ public:
     /**
      * Constructor for file based Indexer
      * @param index_path_dir Path to the directory with the index
+     * @param reindex_immediately Whether to reindex immediately
      */
-    explicit Indexer(const std::string &index_path_dir);
+    Indexer(const std::string &index_path_dir, bool reindex_immediately = true);
     /**
      * Constructor for the Indexer class
      * @param original_collection Original collection of documents
@@ -123,6 +122,15 @@ public:
      */
     [[nodiscard]] float cosine_similarity(const std::map<std::string, float> &query, int doc_id, bool title = false) const;
     /**
+     * Calculate the cosine similarity between the given query and the document with the given ID (file based)
+     * @param query Query
+     * @param doc_id Document ID
+     * @param norms Norms of the documents
+     * @param index Index
+     * @return Cosine similarity
+     */
+    [[nodiscard]] float cosine_similarity_file_based(const map<std::string, float> &query, int doc_id, std::map<int, float> &norms, std::map<std::string, map_element> &index) const;
+    /**
      * Search for the given query (VECTOR MODEL)
      * @param query Query tokens
      * @param k Top k results
@@ -138,6 +146,22 @@ public:
      * @return IDs of the documents that fulfill the query conditions and their positions
      */
     [[nodiscard]] std::tuple<std::vector<int>, std::map<std::string, std::map<int, std::vector<int>>>> search(const std::vector<std::string> &query_tokens, FieldType field = FieldType::ALL) const;
+    /**
+     * Search for the given query (VECTOR MODEL) (file based)
+     * @param query Query tokens
+     * @param k Top k results
+     * @param field Field to search in
+     * @param proximity Proximity search (if 0, no proximity search)
+     * @return IDs of the top k documents and their scores and positions
+     */
+    [[nodiscard]] std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> search_file_based(const std::vector<std::string> &query, int k, FieldType field = FieldType::ALL, int proximity=0) const;
+    /**
+     * Search for the given query (BOOLEAN MODEL) (file based)
+     * @param query_tokens Query tokens (EXPECTED postfix notation)
+     * @param field Field to search in
+     * @return IDs of the documents that fulfill the query conditions and their positions
+     */
+    [[nodiscard]] std::tuple<std::vector<int>, std::map<std::string, std::map<int, std::vector<int>>>> search_file_based(const std::vector<std::string> &query_tokens, FieldType field = FieldType::ALL) const;
 
     /**
      * Indexer to json

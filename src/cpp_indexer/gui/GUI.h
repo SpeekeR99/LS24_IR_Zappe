@@ -11,6 +11,7 @@
 #include "imgui_stdlib.h"
 #include "imgui_internal.h"
 #include "IndexHandler.h"
+#include "Const.h"
 
 class GUI {
 private:
@@ -58,37 +59,64 @@ private:
      */
     static void glfw_error_callback(int error, const char *description);
 
+    /** Current chosen index */
     int current_index = 0;
+    /** Index names */
     std::vector<std::string> indices = {};
+    /** Current chosen field */
     int current_field = 0;
+    /** Current chosen model */
     int current_model = 0;
+    /** K best results */
     int k_best = 3;
+    /** Detect language (query) */
     bool detect_language = false;
 
+    /** Query */
     std::string query;
+    /** Query language */
     std::string query_lang;
 
+    /** Index name */
     char new_index_name[256] = "";
+    /** Data path */
     char data_path[256] = "../data";
+    /** Current document ID */
     int current_doc_id = 0;
+    /** Current document title */
     std::string current_doc_title;
+    /** Current document TOC */
     std::string current_doc_toc;
+    /** Current document H1 */
     std::string current_doc_h1;
+    /** Current document H2 */
     std::string current_doc_h2;
+    /** Current document H3 */
     std::string current_doc_h3;
+    /** Current document content */
     std::string current_doc_content;
+    /** URL to download from */
     char url[256] = "";
 
+    /** Indexers */
     std::vector<Indexer> indexers = {};
 
+    /** Number of results */
     int total_results = 0;
+    /** Search results */
     std::vector<Document> search_results = {};
+    /** Snippet window size */
     const int snippet_window_size = 30;
+    /** Snippets */
     std::vector<std::string> result_snippets = {};
+    /** Highlighted indices */
     std::vector<std::vector<int>> highlight_indices = {};
 
+    /** Phrase search flag */
     bool phrase_search = false;
+    /** Proximity search flag */
     bool proximity_search = false;
+    /** Proximity */
     int proximity = 3;
 
 public:

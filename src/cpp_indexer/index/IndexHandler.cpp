@@ -187,7 +187,12 @@ void IndexHandler::print_query_results(const std::string &query, std::vector<Doc
 std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> IndexHandler::search(Indexer &indexer, std::string &query, int k, FieldType field, int proximity, bool print) {
     auto [query_tokens, _] = preprocessor.preprocess_text(query, true, false);
 
-    auto [doc_ids, scores, positions] = indexer.search(query_tokens, k, field, proximity);
+    std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> result;
+    if (FILE_BASED)
+        result = indexer.search_file_based(query_tokens, k, field, proximity);
+    else
+        result = indexer.search(query_tokens, k, field, proximity);
+    auto [doc_ids, scores, positions] = result;
 
     auto result_docs = get_docs(indexer, doc_ids, false);
 
@@ -204,7 +209,12 @@ std::tuple<std::vector<Document>, std::map<std::string, std::map<int, std::vecto
         std::cout << token << " ";
     std::cout << std::endl;
 
-    auto [result_ids, positions] = indexer.search(bool_tokens, field);
+    std::tuple<std::vector<int>, std::map<std::string, std::map<int, std::vector<int>>>> result;
+    if (FILE_BASED)
+        result = indexer.search_file_based(bool_tokens, field);
+    else
+        result = indexer.search(bool_tokens, field);
+    auto [result_ids, positions] = result;
 
     auto result_docs = get_docs(indexer, result_ids, false);
 

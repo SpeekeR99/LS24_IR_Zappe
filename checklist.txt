@@ -42,6 +42,7 @@ Nadstandardní funkčnost (lze získat až dalších 15 bodů), např.:
  - vlastní implementace parsování dotazů bez použití externí knihovny                                             (DONE) (1b)
  - implementace dalšího modelu (použití sémantických prostorů, doc2vec,                                       (NOT DONE)
    Transformers - BERT) atd. (1-5b podle náročnosti),
+ - podpora více jazyků                                                                                        (NOT DONE)
  - jakékoliv další užitečné vylepšení, které vás napadne                                                      (NOT DONE)
 
 Pokud není uvedeno jinak, dostanete za každou nadstandardní funkčnost 1 bod za funkční řešení, 2 body v případě "hezkého" řešení (efektivnější, nebo v jiných ohledech lepší než běžné)

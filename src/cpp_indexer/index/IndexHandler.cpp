@@ -229,11 +229,7 @@ std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &
     auto content = doc.content;
     auto tokenized_doc = indexer.get_tokenized_doc(doc_id);
     auto words_tok = tokenized_doc.content;
-
-    std::vector<std::string> words_orig;
-    std::istringstream iss(content);
-    for (std::string s; iss >> s; )
-        words_orig.push_back(s);
+    auto [words_orig, _] = preprocessor.tokenize(content);
 
     if (words_tok.size() <= window_size) /* WTF? ID 278 has only 28 words */
         window_size = words_tok.size();

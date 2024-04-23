@@ -7,24 +7,69 @@ bool FILE_BASED = false;
 bool DETECT_LANG = true;
 
 /**
+ * Parse arguments
+ * @param argc Argument count
+ * @param argv Argument values
+ */
+void parse_args(int argc, char **argv) {
+    for (int i = 1; i < argc; i++) {
+        if (std::string(argv[i]) == "--file-based")
+            FILE_BASED = true;
+        if (std::string(argv[i]) == "--no-lang-detect")
+            DETECT_LANG = false;
+    }
+}
+
+/**
  * Main function
  * @return Exit code
  */
-int main() {
+int main(int argc, char **argv) {
+    /* Parse arguments, set FILE_BASED and DETECT_LANG */
+    parse_args(argc, argv);
+
+    /* Run the GUI */
     GUI gui = GUI();
     gui.run();
 
-    std::string base_dir = FILE_BASED_INDEX_PATH + "index1/";
-    if (!std::filesystem::exists(base_dir))
-        std::filesystem::create_directory(base_dir);
+//    auto docs = IndexHandler::load_documents("../data");
+//    auto [tokenized_docs, positions_map] = IndexHandler::preprocess_documents(docs);
+//    auto indexer = Indexer(docs, tokenized_docs, positions_map);
+//
+//    IndexHandler::save_index(indexer, "../index/index1.json");
+//    auto indexer = Indexer();
+//    IndexHandler::load_index(indexer, "../index/index1.json");
+//
+//    std::string query = "Geralt of Rivia";
+//    auto [docs_result, scores, positions] = IndexHandler::search(indexer, query, 3, FieldType::ALL);
+//    auto positions_geralt = positions["geralt"][954];
+//    for (const auto &pos : positions_geralt)
+//        std::cout << pos << " ";
+//    std::cout << std::endl;
+//
+//    /* Open Magistrovo hlaseni.json */
+//    std::string doc_path = "../data/Magistrovo hlaseni.json";
+//    auto doc = DataLoader::load_json_document(doc_path);
+//    Preprocessor preprocessor = Preprocessor();
+//    auto [tokens, _] = preprocessor.tokenize(doc.content);
+//
+//    std::cout << tokens[237] << std::endl;
+//
+//    /* Run the GUI */
+//    GUI gui = GUI();
+//    gui.run();
 
-    /* Load documents */
+//    std::string base_dir = FILE_BASED_INDEX_PATH + "index1/";
+//    if (!std::filesystem::exists(base_dir))
+//        std::filesystem::create_directory(base_dir);
+//
+//    /* Load documents */
 //    {
 //        auto docs = IndexHandler::load_documents("../data");
 //        FileBasedLoader::save_doc_cache(docs, base_dir);
 //    }
-
-    /* Preprocess documents */
+//
+//    /* Preprocess documents */
 //    {
 //        std::vector<Document> docs;
 //        {
@@ -36,10 +81,10 @@ int main() {
 //        FileBasedLoader::save_tokenized_docs(tokenized_docs, base_dir);
 //        FileBasedLoader::save_positions_map(positions_map, base_dir);
 //    }
-
-    /* Index documents */
-    auto indexer = Indexer(base_dir);
-
+//
+//    /* Index documents */
+//    auto indexer = Indexer(base_dir);
+//
 //    /* Save the index */
 //    IndexHandler::save_index(indexer, "../index/index1.json");
 //
@@ -47,16 +92,16 @@ int main() {
 //    indexer = Indexer();
 //    IndexHandler::load_index(indexer, "../index/index1.json");
 //
-    /* Search "Geralt z Rivie" */
-    std::string query = "Geralt Rivie";
-    auto [docs_result, scores, positions] = IndexHandler::search(indexer, query, 3, FieldType::ALL, 3);
-    auto [snippet, highlight_index] = IndexHandler::create_snippet(indexer, docs_result[0].id, positions, 30);
-    std::cout << snippet << std::endl;
-    for (const auto &index : highlight_index)
-        std::cout << index << " ";
-    std::cout << std::endl << std::endl;
-    std::tie(docs_result, scores, positions) = IndexHandler::search(indexer, query, 3, FieldType::TITLE);
-
+//    /* Search "Geralt z Rivie" */
+//    std::string query = "Geralt Rivie";
+//    auto [docs_result, scores, positions] = IndexHandler::search(indexer, query, 3, FieldType::ALL, 3);
+//    auto [snippet, highlight_index] = IndexHandler::create_snippet(indexer, docs_result[0].id, positions, 30);
+//    std::cout << snippet << std::endl;
+//    for (const auto &index : highlight_index)
+//        std::cout << index << " ";
+//    std::cout << std::endl << std::endl;
+//    std::tie(docs_result, scores, positions) = IndexHandler::search(indexer, query, 3, FieldType::TITLE);
+//
 //    /* Update the document, so it contains "Geralt z Rivie" more and so it is way more relevant (see Score print) */
 //    std::vector<int> new_doc_ids = {550};
 //    std::vector<Document> new_docs = {{550, {"už ne Geralt z Rivie"}, {}, {}, {}, {}, {"Geralt z Rivie Geralt z Rivie Geralt z Rivie Geralt z Rivie"}}};

@@ -168,7 +168,9 @@ void GUI::render() {
                 ImGui::SetWindowSize(ImVec2((float) window_width / 3, (float) window_height));
                 ImGui::SetWindowFontScale(font_scale);
 
-                if (ImGui::BeginCombo("Index", indices[current_index].c_str())) {
+                if (indices.empty())
+                    ImGui::Text("Neexistují žádné indexy!");
+                else if (ImGui::BeginCombo("Index", indices[current_index].c_str())) {
                     for (int i = 0; i < indices.size(); i++) {
                         bool is_selected = (current_index == i);
                         if (ImGui::Selectable(indices[i].c_str(), is_selected))
@@ -269,7 +271,9 @@ void GUI::render() {
                     this->total_results = this->search_results.size();
                 }
 
-                static auto autocomplete_entries = indexers[current_index].get_keywords();
+                static std::unordered_set<std::string> autocomplete_entries;
+                if (!indices.empty())
+                    autocomplete_entries = indexers[current_index].get_keywords();
 
                 if (!query.empty()) {
                     std::istringstream iss(query);
@@ -359,7 +363,9 @@ void GUI::render() {
                 ImGui::SetWindowSize(ImVec2((float) window_width / 3, (float) window_height));
                 ImGui::SetWindowFontScale(font_scale);
 
-                if (ImGui::BeginCombo("Vybraný index", indices[current_index].c_str())) {
+                if (indices.empty())
+                    ImGui::Text("Neexistují žádné indexy!");
+                else if (ImGui::BeginCombo("Vybraný index", indices[current_index].c_str())) {
                     for (int i = 0; i < indices.size(); i++) {
                         bool is_selected = (current_index == i);
                         if (ImGui::Selectable(indices[i].c_str(), is_selected))
@@ -637,6 +643,7 @@ void GUI::render() {
         if (show_about_window) {
             ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always,
                                     ImVec2(0.5f, 0.5f)); // Center the window
+            ImGui::SetNextWindowFocus();
             ImGui::Begin("O aplikaci", &show_about_window,
                          ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
                          ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoCollapse);

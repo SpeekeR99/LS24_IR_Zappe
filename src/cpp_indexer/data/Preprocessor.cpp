@@ -153,14 +153,17 @@ std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Pre
         if (token.empty())
             continue;
 
-        /* If token contains   (non-breaking space), split it into two tokens */
-        if (token.find(" ") != std::string::npos) {
-            while (token.find(" ") != std::string::npos)
-                token = std::regex_replace(token, std::regex(" "), " ");
+        /* If token contains std::isspace, split it into more tokens */
+        if (std::any_of(token.begin(), token.end(), [](char c) { return std::isspace(c); })) {
+            while (std::regex_search(token, std::regex(R"(\s+)")))
+                token = std::regex_replace(token, std::regex(R"(\s+)"), "<temp>");
 
-            std::istringstream iss(token);
+            while (std::regex_search(token, std::regex(R"(<temp>)")))
+                token = std::regex_replace(token, std::regex(R"(<temp>)"), " ");
+
+            std::istringstream iss2(token);
             std::string new_token;
-            while (iss >> new_token) {
+            while (iss2 >> new_token) {
                 tokens.push_back(new_token);
                 token_positions[new_token].push_back(static_cast<int>(tokens.size() - 1));
             }
@@ -194,6 +197,12 @@ std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Pre
         tokens.push_back(token);
         token_positions[token].push_back(static_cast<int>(tokens.size() - 1));
     }
+
+//    for (auto & token : tokens) {
+//        /* if token containts white space print it */
+//        if (std::regex_match(token, std::regex(R"(\s+)")))
+//            std::cout << "Token: " << token << std::endl;
+//    }
 
     return {tokens, token_positions};
 }

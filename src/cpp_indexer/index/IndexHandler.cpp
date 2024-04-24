@@ -67,6 +67,7 @@ void IndexHandler::load_index(Indexer &indexer, const string &index_path) {
 
     DataLoader::load_index_from_file(indexer, index_path);
     indexer.docs_to_keywords();
+    DataLoader::id_counter = indexer.get_max_doc_id() + 1;
 
     auto t_end = std::chrono::high_resolution_clock::now();
     std::cout << "Index loaded in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;

@@ -307,6 +307,11 @@ std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<
     for (const auto& doc: this->collection)
         results.emplace_back(doc.id, this->cosine_similarity(tf_idf_query, doc.id));
 
+    /* Take care of nans */
+    for (auto& [doc_id, value] : results)
+        if (std::isnan(value))
+            value = 0;
+
     if (field == FieldType::ALL) {
         /* Combine results from title and content, title matches are weighted more */
         const float title_weight = 1.5;
@@ -317,11 +322,6 @@ std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<
     } else if (field == FieldType::CONTENT) {
         /* Do nothing */
     }
-
-    /* Take care of nans */
-    for (auto& [doc_id, value] : results)
-        if (std::isnan(value))
-            value = 0;
 
     /* Get positions of the words in the query */
     std::map<std::string, std::map<int, std::vector<int>>> positions;
@@ -801,4 +801,12 @@ int Indexer::get_title_index_size() const {
 
 std::unordered_set<std::string> Indexer::get_keywords() const {
     return this->keywords;
+}
+
+int Indexer::get_max_doc_id() const {
+    int max_id = 0;
+    for (const auto &doc : this->collection)
+        if (doc.id > max_id)
+            max_id = doc.id;
+    return max_id;
 }

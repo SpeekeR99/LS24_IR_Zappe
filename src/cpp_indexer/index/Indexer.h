@@ -194,4 +194,9 @@ public:
      * @return keywords
      */
     [[nodiscard]] std::unordered_set<std::string> get_keywords() const;
+    /**
+     * Get max doc ID
+     * @return Max doc ID
+     */
+    [[nodiscard]] int get_max_doc_id() const;
 };

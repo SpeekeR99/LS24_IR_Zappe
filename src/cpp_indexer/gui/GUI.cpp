@@ -255,7 +255,14 @@ void GUI::render() {
                             std::tie(result, scores, positions) = IndexHandler::search(index, query, k_best, field);
                         this->search_results = result;
                         for (const auto &doc : search_results) {
-                            auto [snippet, highlight_index] = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size);
+                            std::string snippet;
+                            std::vector<int> highlight_index;
+                            if (proximity_search)
+                                std::tie(snippet, highlight_index) = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size, proximity);
+                            else if (phrase_search)
+                                std::tie(snippet, highlight_index) = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size, 1);
+                            else
+                                std::tie(snippet, highlight_index) = IndexHandler::create_snippet(index, doc.id, positions, snippet_window_size);
                             result_snippets.emplace_back(snippet);
                             highlight_indices.emplace_back(highlight_index);
                         }

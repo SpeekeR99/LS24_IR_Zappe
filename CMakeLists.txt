@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(cpp_tf_idf)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ -m64")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++ --static -m64")
 
 include_directories(src)
 include_directories(src/cpp_indexer)

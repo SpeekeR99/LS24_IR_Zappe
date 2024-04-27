@@ -132,5 +132,5 @@ public:
      * @param window_size Window size
      * @return Snippet and Indexes to highlight
      */
-     static std::tuple<std::string, std::vector<int>> create_snippet(Indexer &indexer, int doc_id, std::map<std::string, std::map<int, vector<int>>> &positions, int window_size);
+     static std::tuple<std::string, std::vector<int>> create_snippet(Indexer &indexer, int doc_id, std::map<std::string, std::map<int, vector<int>>> &positions, int window_size, int proximity=0);
 };

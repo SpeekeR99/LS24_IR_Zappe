@@ -307,8 +307,11 @@ std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<
     for (const auto& doc: this->collection)
         results.emplace_back(doc.id, this->cosine_similarity(tf_idf_query, doc.id));
 
-    /* Take care of nans */
+    /* Take care of NaNs - some documents are just titles - WTF? (ID 1492) */
     for (auto& [doc_id, value] : results)
+        if (std::isnan(value))
+            value = 0;
+    for (auto& [doc_id, value] : title_results)
         if (std::isnan(value))
             value = 0;
 

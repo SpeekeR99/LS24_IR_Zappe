@@ -225,7 +225,7 @@ std::tuple<std::vector<Document>, std::map<std::string, std::map<int, std::vecto
     return {result_docs, positions};
 }
 
-std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &indexer, int doc_id, std::map<std::string, std::map<int, vector<int>>> &positions, int window_size) {
+std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &indexer, int doc_id, std::map<std::string, std::map<int, vector<int>>> &positions, int window_size, int proximity) {
     auto doc = indexer.get_doc(doc_id);
     auto content = doc.content;
     auto tokenized_doc = indexer.get_tokenized_doc(doc_id);
@@ -236,30 +236,38 @@ std::tuple<std::string, std::vector<int>> IndexHandler::create_snippet(Indexer &
         window_size = words_tok.size();
 
     std::tuple<int, int, int> best_window = std::make_tuple(0, window_size - 1, 0); // start, end, unique words count
+    int best_proximity_count = 0;
 
-    /* Positions = word -> (doc_id, positions) */
     for (const auto &[word, pos_list] : positions) {
         for (const auto &[doc_id_, positions_] : pos_list) {
             if (doc_id_ != doc_id)
                 continue;
             for (const auto &pos : positions_) {
-                /* Find the window around the position */
                 int start = std::max(0, pos - window_size / 2);
                 int end = std::min((int)words_tok.size() - 1, start + window_size - 1);
                 start = std::max(0, end - window_size + 1);
 
                 std::set<std::string> unique_words_in_window;
-                for (int i = start; i <= end; i++)
-                    if (i < words_tok.size() && positions.count(words_tok[i]) > 0)
+                int proximity_count = 0;
+                for (int i = start; i <= end; i++) {
+                    if (i < words_tok.size() && positions.count(words_tok[i]) > 0) {
                         unique_words_in_window.insert(words_tok[i]);
+                        for (int j = i + 1; j <= end; j++) {
+                            if (j < words_tok.size() && positions.count(words_tok[j]) > 0 && abs(i - j) <= proximity) {
+                                proximity_count++;
+                            }
+                        }
+                    }
+                }
 
-                if (unique_words_in_window.size() > std::get<2>(best_window))
+                if (unique_words_in_window.size() > std::get<2>(best_window) && (!proximity or proximity_count > best_proximity_count)) {
                     best_window = std::make_tuple(start, end, unique_words_in_window.size());
+                    best_proximity_count = proximity_count;
+                }
             }
         }
     }
 
-    /* Which words in the window should be highlighted */
     std::vector<int> highlight_indexes{};
     for (int i = std::get<0>(best_window); i <= std::get<1>(best_window); i++)
         if (i < words_tok.size() && positions.count(words_tok[i]) > 0)

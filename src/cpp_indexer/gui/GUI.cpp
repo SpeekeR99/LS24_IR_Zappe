@@ -179,15 +179,19 @@ void GUI::render() {
                             ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
+                    if (indexers[current_index].get_max_doc_id())
+                        DataLoader::id_counter = indexers[current_index].get_max_doc_id() + 1;
+                    else
+                        DataLoader::id_counter = 0;
                 }
-
-                const char *field_names[] = {"Vše", "Nadpis", "Obsah"};
-                ImGui::ListBox("Hledat v", &current_field, field_names, IM_ARRAYSIZE(field_names));
 
                 const char *model_names[] = {"Vektorový", "Booleovský"};
                 ImGui::ListBox("Model", &current_model, model_names, IM_ARRAYSIZE(model_names));
 
                 if (current_model == 0) { /* Vector model */
+                    const char *field_names[] = {"Vše", "Nadpis", "Obsah"};
+                    ImGui::ListBox("Hledat v", &current_field, field_names, IM_ARRAYSIZE(field_names));
+                    
                     ImGui::InputInt("K nejlepších", &k_best);
                     if (k_best < 1)
                         k_best = 1;
@@ -243,7 +247,14 @@ void GUI::render() {
                     result_snippets.clear();
                     highlight_indices.clear();
 
-                    if (current_model == 0) { /* Vector model */
+                    bool do_search = true;
+                    if (query.empty()) {
+                        std::cout << "Empty query!" << std::endl << std::endl;
+                        search_results.clear();
+                        do_search = false;
+                    }
+
+                    if (do_search && current_model == 0) { /* Vector model */
                         std::vector<Document> result;
                         std::vector<float> scores;
                         std::map<std::string, std::map<int, std::vector<int>>> positions;
@@ -266,7 +277,7 @@ void GUI::render() {
                             result_snippets.emplace_back(snippet);
                             highlight_indices.emplace_back(highlight_index);
                         }
-                    } else { /* Boolean model */
+                    } else if (do_search && current_model == 1) { /* Boolean model */
                         auto [result, positions] = IndexHandler::search(index, query, field);
                         this->search_results = result;
                         for (const auto &doc : search_results) {
@@ -381,6 +392,10 @@ void GUI::render() {
                             ImGui::SetItemDefaultFocus();
                     }
                     ImGui::EndCombo();
+                    if (indexers[current_index].get_max_doc_id())
+                        DataLoader::id_counter = indexers[current_index].get_max_doc_id() + 1;
+                    else
+                        DataLoader::id_counter = 0;
                 }
                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
@@ -408,6 +423,10 @@ void GUI::render() {
                         indexers.emplace_back(indexer);
                     }
                     current_index = indices.size() - 1;
+                    if (indexers[current_index].get_max_doc_id())
+                        DataLoader::id_counter = indexers[current_index].get_max_doc_id() + 1;
+                    else
+                        DataLoader::id_counter = 0;
                 }
 
                 ImGui::InputTextWithHint("Data", "Zadejte cestu k datům...", data_path, IM_ARRAYSIZE(data_path));

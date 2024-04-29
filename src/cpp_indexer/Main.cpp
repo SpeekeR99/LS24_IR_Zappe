@@ -5,6 +5,8 @@
 bool FILE_BASED = false;
 /** Language detection is REALLY sloooow */
 bool DETECT_LANG = true;
+/** Use lemmatization or stemming */
+bool USE_LEMMA = true;
 
 /**
  * Parse arguments
@@ -13,10 +15,24 @@ bool DETECT_LANG = true;
  */
 void parse_args(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
+        if (std::string(argv[i]) == "--help") {
+            std::cout << "Usage: ./cpp_indexer [--file-based] [--no-lang-detect] [--lemma | --stem]" << std::endl;
+            std::cout << "Options:" << std::endl;
+            std::cout << "\t--file-based\t\tUse file based index" << std::endl;
+            std::cout << "\t--no-lang-detect\tDo not detect language" << std::endl;
+            std::cout << "\t--lemma\t\t\t\tUse lemmatization" << std::endl;
+            std::cout << "\t--stem\t\t\t\tUse stemming" << std::endl;
+            exit(EXIT_SUCCESS);
+        }
+
         if (std::string(argv[i]) == "--file-based")
             FILE_BASED = true;
         if (std::string(argv[i]) == "--no-lang-detect")
             DETECT_LANG = false;
+        if (std::string(argv[i]) == "--lemma")
+            USE_LEMMA = true;
+        if (std::string(argv[i]) == "--stem")
+            USE_LEMMA = false;
     }
 }
 

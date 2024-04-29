@@ -374,6 +374,12 @@ std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<
         results = filtered_results;
     }
 
+    /* Throw away results with score of 0 */
+    /* TODO: ask about this! */
+    results.erase(std::remove_if(results.begin(), results.end(), [](const std::pair<int, float> &a) {
+        return a.second == 0;
+    }), results.end());
+
     /* Sort results by cosine similarity */
     std::sort(results.begin(), results.end(), [](const std::pair<int, float> &a, const std::pair<int, float> &b) {
         return a.second > b.second;

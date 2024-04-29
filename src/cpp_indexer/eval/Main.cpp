@@ -2,6 +2,13 @@
 #include "DataUtils.h"
 #include "IndexHandler.h"
 
+/** File based index */
+bool FILE_BASED = false;
+/** Language detection is REALLY sloooow */
+bool DETECT_LANG = false;
+/** Use lemmatization or stemming */
+bool USE_LEMMA = true;
+
 int main() {
     std::cout << "Loading documents..." << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
@@ -28,11 +35,15 @@ int main() {
     start = std::chrono::high_resolution_clock::now();
     std::ofstream output("../src/cpp_indexer/eval/data/results_" + std::to_string(std::chrono::system_clock::to_time_t(start)) + ".txt");
     for (const Query &query : queries) {
-        std::string query_str = query.title + " " + query.description;
+//        std::string query_str = query.title + " " + query.description;
+        std::string query_str = query.title;
+//        std::string query_str = query.description;
         std::cout << "Query " << query.id << ": " << query_str << std::endl;
         auto [docs_result, scores, positions] = IndexHandler::search(indexer, query_str, 1000000, FieldType::ALL, 0, false);
+        std::cout << "Writing results..." << std::endl;
         for (auto i = 0; i < docs_result.size(); i++) {
-            std::string line = query.id + " Q0 d" + std::to_string(docs_result[i].id) + " " + std::to_string(i + 1) + " " + std::to_string(scores[i] / 2.5) + " runindex1";
+            std::string line = query.id + " Q0 d" + std::to_string(docs_result[i].id) + " " + std::to_string(i + 1) + " " + std::to_string(scores[i]) + " runindex1";
+//            std::string line = query.id + " Q0 d" + std::to_string(docs_result[i].id) + " " + std::to_string(i + 1) + " " + std::to_string(scores[i] / 2.5) + " runindex1";
             output << line << std::endl;
         }
     }

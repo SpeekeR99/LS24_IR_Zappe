@@ -26,12 +26,12 @@ std::pair<std::vector<TokenizedDocument>, std::map<std::string, std::map<int, st
     auto tokenized_docs = std::vector<TokenizedDocument>();
     std::map<int, std::map<std::string, std::vector<int>>> positions;
     for (auto &doc : docs) {
-        auto [title, title_pos] = preprocessor.preprocess_text(doc.title, true, false);
-        auto [toc, toc_pos] = preprocessor.preprocess_text(doc.toc, true, false);
-        auto [h1, h1_pos] = preprocessor.preprocess_text(doc.h1, true, false);
-        auto [h2, h2_pos] = preprocessor.preprocess_text(doc.h2, true, false);
-        auto [h3, h3_pos] = preprocessor.preprocess_text(doc.h3, true, false);
-        auto [content, content_pos] = preprocessor.preprocess_text(doc.content, true, true);
+        auto [title, title_pos] = preprocessor.preprocess_text(doc.title, false);
+        auto [toc, toc_pos] = preprocessor.preprocess_text(doc.toc, false);
+        auto [h1, h1_pos] = preprocessor.preprocess_text(doc.h1, false);
+        auto [h2, h2_pos] = preprocessor.preprocess_text(doc.h2, false);
+        auto [h3, h3_pos] = preprocessor.preprocess_text(doc.h3, false);
+        auto [content, content_pos] = preprocessor.preprocess_text(doc.content, true);
         tokenized_docs.emplace_back(doc.id, title, toc, h1, h2, h3, content);
         positions[doc.id] = content_pos;
     }
@@ -67,7 +67,10 @@ void IndexHandler::load_index(Indexer &indexer, const string &index_path) {
 
     DataLoader::load_index_from_file(indexer, index_path);
     indexer.docs_to_keywords();
-    DataLoader::id_counter = indexer.get_max_doc_id() + 1;
+    if (indexer.get_max_doc_id())
+        DataLoader::id_counter = indexer.get_max_doc_id() + 1;
+    else
+        DataLoader::id_counter = 0;
 
     auto t_end = std::chrono::high_resolution_clock::now();
     std::cout << "Index loaded in " << std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count() << "ms" << std::endl << std::endl;
@@ -186,7 +189,11 @@ void IndexHandler::print_query_results(const std::string &query, std::vector<Doc
 }
 
 std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> IndexHandler::search(Indexer &indexer, std::string &query, int k, FieldType field, int proximity, bool print) {
-    auto [query_tokens, _] = preprocessor.preprocess_text(query, true, false);
+    std::cout << "Query: " << query << std::endl << "Query tokens: ";
+    auto [query_tokens, _] = preprocessor.preprocess_text(query, true);
+    for (auto &token : query_tokens)
+        std::cout << token << " ";
+    std::cout << std::endl;
 
     std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<int, std::vector<int>>>> result;
     if (FILE_BASED)
@@ -195,10 +202,13 @@ std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std:
         result = indexer.search(query_tokens, k, field, proximity);
     auto [doc_ids, scores, positions] = result;
 
-    auto result_docs = get_docs(indexer, doc_ids, false);
+//    auto result_docs = get_docs(indexer, doc_ids, false);
+    std::vector<Document> result_docs;
+    for (auto &doc_id : doc_ids)
+        result_docs.push_back({doc_id, "", {}, {}, {}, {}, ""});
 
-    if (print)
-        print_query_results(query, {result_docs, scores}, positions);
+//    if (print)
+//        print_query_results(query, {result_docs, scores}, positions);
 
     return {result_docs, scores, positions};
 }
@@ -209,6 +219,9 @@ std::tuple<std::vector<Document>, std::map<std::string, std::map<int, std::vecto
     for (auto &token : bool_tokens)
         std::cout << token << " ";
     std::cout << std::endl;
+
+    if (bool_tokens.empty())
+        return {{}, {}};
 
     std::tuple<std::vector<int>, std::map<std::string, std::map<int, std::vector<int>>>> result;
     if (FILE_BASED)

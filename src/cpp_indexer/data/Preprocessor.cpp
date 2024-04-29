@@ -250,7 +250,7 @@ std::vector<std::string> &Preprocessor::remove_duplicates(std::vector<std::strin
     return words;
 }
 
-std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Preprocessor::preprocess_text(std::string text, bool lemma, bool content) {
+std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Preprocessor::preprocess_text(std::string text, bool content) {
     /* Lower case */
     text = this->to_lower(text);
 
@@ -263,7 +263,7 @@ std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Pre
 
     /* Stem or lemmatize */
     if (content) {
-        if (lemma)
+        if (USE_LEMMA)
             tokens = this->lemmatize(tokens);
         else
             tokens = this->stem(tokens);
@@ -280,9 +280,9 @@ std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Pre
     return {tokens, token_positions};
 }
 
-std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Preprocessor::preprocess_text(const std::vector<std::string> &text, bool lemma, bool content) {
+std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> Preprocessor::preprocess_text(const std::vector<std::string> &text, bool content) {
     std::string combined = std::accumulate(text.begin(), text.end(), std::string(" "));
-    return preprocess_text(combined, lemma, content);
+    return preprocess_text(combined, content);
 }
 
 int Preprocessor::bool_op_precedence(const string &op) {
@@ -359,7 +359,7 @@ std::vector<std::string> Preprocessor::parse_bool_query(const string &query) {
                 }
                 operators.emplace_back(operators_map[Operator::OR]);
             }
-            auto [preprocessed_token, _] = preprocess_text(token, true, false);
+            auto [preprocessed_token, _] = preprocess_text(token, false);
             tokens.push_back(preprocessed_token[0]);
             is_operator = false;
             is_and_or = false;

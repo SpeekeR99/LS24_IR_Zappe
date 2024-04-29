@@ -9,6 +9,7 @@
 #include <map>
 #include <tuple>
 
+#include "Const.h"
 #include "libstemmer.h"
 #include "RdrLemmatizer.h"
 #include "sl_lemmatizer.h"
@@ -147,19 +148,17 @@ public:
     /**
      * Preprocess the given text
      * @param text Input text
-     * @param lemma Whether to lemmatize the text
      * @param content Whether to preprocess the content of the text
      * @return Preprocessed text with tokens and their positions
      */
-    std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> preprocess_text(std::string text, bool lemma=true, bool content=false);
+    std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> preprocess_text(std::string text, bool content=false);
     /**
      * Preprocess the given vector of words, phrases or sentences
      * @param text Input vector of words, phrases or sentences
-     * @param lemma Whether to lemmatize the text
      * @param content Whether to preprocess the content of the text
      * @return Preprocessed text with tokens and their positions
      */
-    std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> preprocess_text(const std::vector<std::string> &text, bool lemma=true, bool content=false);
+    std::pair<std::vector<std::string>, std::map<std::string, std::vector<int>>> preprocess_text(const std::vector<std::string> &text, bool content=false);
 
     /**
      * Parse the given boolean query into postfix notation

@@ -1,14 +1,15 @@
 Lematizace (pouze dokumentu):
     - title + description:                                                     MAP = 0.0399
-    - title + description + normalizace skore:                                 MAP = 0.0399
+  ( - title + description + normalizace skore:                                 MAP = 0.0399 )
 Lematizace (i query):
     - title + description:                                                     MAP = 0.0801
     - title:                                                                   MAP = 0.0924
+  ( - title + nevraceni dokumentu se skorem 0:                                 MAP = 0.0924 )
     - description:                                                             MAP = 0.0707
 
 Stemming (pouze dokumentu):
     - title + description:                                                     MAP = 0.0159
-    - title + description + normalizace skore:                                 MAP = 0.0159
+  ( - title + description + normalizace skore:                                 MAP = 0.0159 )
 Stemming (i query):
     - title + description:                                                     MAP = 0.0160
     - title:                                                                   MAP = 0.0221

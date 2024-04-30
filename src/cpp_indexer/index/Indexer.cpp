@@ -375,7 +375,6 @@ std::tuple<std::vector<int>, std::vector<float>, std::map<std::string, std::map<
     }
 
     /* Throw away results with score of 0 */
-    /* TODO: ask about this! */
     results.erase(std::remove_if(results.begin(), results.end(), [](const std::pair<int, float> &a) {
         return a.second == 0;
     }), results.end());

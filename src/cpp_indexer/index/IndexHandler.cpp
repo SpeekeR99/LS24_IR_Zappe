@@ -202,13 +202,13 @@ std::tuple<std::vector<Document>, std::vector<float>, std::map<std::string, std:
         result = indexer.search(query_tokens, k, field, proximity);
     auto [doc_ids, scores, positions] = result;
 
-//    auto result_docs = get_docs(indexer, doc_ids, false);
-    std::vector<Document> result_docs;
-    for (auto &doc_id : doc_ids)
-        result_docs.push_back({doc_id, "", {}, {}, {}, {}, ""});
+    auto result_docs = get_docs(indexer, doc_ids, false);
+//    std::vector<Document> result_docs; /* Evaluation takes less time and only needs IDs */
+//    for (auto &doc_id : doc_ids)
+//        result_docs.push_back({doc_id, "", {}, {}, {}, {}, ""});
 
-//    if (print)
-//        print_query_results(query, {result_docs, scores}, positions);
+    if (print)
+        print_query_results(query, {result_docs, scores}, positions);
 
     return {result_docs, scores, positions};
 }

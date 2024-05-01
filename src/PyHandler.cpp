@@ -19,17 +19,17 @@ std::string PyHandler::exec(const std::string &cmd) {
 }
 
 std::string PyHandler::run_crawler(const std::string &url) {
-    auto cmd = std::string(CRAWLER_BAT) + " " + url;
+    auto cmd = std::string(CRAWLER_PATH) + " " + url;
     return exec(cmd);
 }
 
 std::string PyHandler::run_lang_detector(const std::string &dir) {
-    auto cmd = std::string(LANG_DETECTOR_BAT) + " " + MODEL_PATH + " " + dir;
+    auto cmd = std::string(LANG_DETECTOR_PATH) + " " + MODEL_PATH + " " + dir;
     return exec(cmd);
 }
 
 std::string PyHandler::run_lang_detector_text(const std::string &text) {
-    auto cmd = std::string(LANG_DETECTOR_BAT_TEXT) + " " + MODEL_PATH + " " + text;
+    auto cmd = std::string(LANG_DETECTOR_BAT_PATH) + " " + MODEL_PATH + " " + text;
     return exec(cmd);
 }
 

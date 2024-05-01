@@ -1,0 +1,1 @@
+python3 ../src/py_lang_detect/lang_detector.py %1 %2

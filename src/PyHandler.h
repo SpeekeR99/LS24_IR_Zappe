@@ -11,18 +11,30 @@
 #include <vector>
 #include "cpp_indexer/data/Document.h"
 
+#ifdef __linux__
+#define _CRAWLER_PATH_ "crawler.sh"
+#define _LANG_DETECTOR_PATH_ "lang_detector.sh"
+#define _LANG_DETECTOR_TEXT_PATH_ "lang_detector_text.sh"
+#elif _WIN32
+#define _CRAWLER_PATH_ "crawler.bat"
+#define _LANG_DETECTOR_PATH_ "lang_detector.bat"
+#define _LANG_DETECTOR_TEXT_PATH_ "lang_detector_text.bat"
+#else
+
+#endif
+
 /**
  * Python script handler class
  * Calls .bat files in /bin directory
  */
 class PyHandler {
 private:
-    /** Paths to the .bat files */
-    constexpr static const char* CRAWLER_BAT = "crawler.bat";
-    /** Paths to the .bat files */
-    constexpr static const char* LANG_DETECTOR_BAT = "lang_detector.bat";
-    /** Paths to the .bat files */
-    constexpr static const char* LANG_DETECTOR_BAT_TEXT = "lang_detector_text.bat";
+    /** Paths to the script files */
+    constexpr static const char* CRAWLER_PATH = _CRAWLER_PATH_;
+    /** Paths to the script files */
+    constexpr static const char* LANG_DETECTOR_PATH = _LANG_DETECTOR_PATH_;
+    /** Paths to the script files */
+    constexpr static const char* LANG_DETECTOR_BAT_PATH = _LANG_DETECTOR_TEXT_PATH_;
     /** Path to the language detector model */
     constexpr static const char* MODEL_PATH = "../src/py_lang_detect/model.bin";
 

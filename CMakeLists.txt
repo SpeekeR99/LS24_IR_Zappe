@@ -59,6 +59,8 @@ find_package(OpenGL REQUIRED)
 add_definitions(-DGLEW_STATIC)
 
 # Including GLFW
+set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Build GLFW with Wayland support")
+set(GLFW_BUILD_X11 ON CACHE BOOL "Build GLFW with X11 support")
 add_subdirectory(lib/glfw)
 include_directories(${GLFW_INCLUDE_DIRS})
 
